@@ -46,7 +46,7 @@ jobs:
 
       # push docker image
       - name: push docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }/${{ env.PROJECT_NAME }}
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.PROJECT_NAME }}
 
   deploy:
     needs: build
@@ -54,7 +54,7 @@ jobs:
     steps:
       # pull new image
       - name: pull docker image
-        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }/${{ env.PROJECT_NAME }}
+        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ env.PROJECT_NAME }}
 
       # stop old container
       - name: stop old container
