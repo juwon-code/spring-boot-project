@@ -34,6 +34,10 @@ jobs:
         run: chmod +x ./gradlew
 
       # build gradle project
+      - name: build project with gradlew
+        run: ./gradlew build
+        
+      # build docker image
       - name: build docker image
         run: docker build -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/${{ env.PROJECT_NAME }} .
 
