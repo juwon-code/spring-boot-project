@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
+
 @Service
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
@@ -32,4 +34,33 @@ public class MemberServiceImpl implements MemberService {
             return false;
         }
     }
+
+    @Override
+    public boolean changePassword(MemberDto.ChangePasswordRequestDto dto) {
+        try {
+            Member member = memberRepository.findMemberByUsernameAndPassword(dto.getUsername(), dto.getOriginPassword())
+                    .orElseThrow(NoSuchElementException::new);
+            member.setPassword(dto.getChangePassword());
+            memberRepository.save(member);
+            logger.info("Successfully change Member password");
+            return true;
+        } catch (IllegalArgumentException e) {
+            logger.info("Cannot change password with invalid param");
+            return false;
+        }
+    }
+
+    @Override
+    public boolean withdraw(MemberDto.WithdrawRequestDto dto) {
+        Long deletedCount = memberRepository.deleteMemberByUsernameAndPassword(dto.getUsername(), dto.getPassword());
+
+        if (deletedCount != 1) {
+            logger.info("Cannot delete Member: {}", dto.getUsername());
+            return false;
+        }
+
+        logger.info("Successfully delete Member: {}", dto.getUsername());
+        return true;
+    }
+
 }

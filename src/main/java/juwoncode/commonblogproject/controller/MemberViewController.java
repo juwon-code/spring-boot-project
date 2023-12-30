@@ -28,6 +28,11 @@ public class MemberViewController {
         return "member/register";
     }
 
+    @GetMapping("/change/password")
+    public String getChangePasswordPage() {
+        return "member/change/password";
+    }
+
     @PostMapping("/register")
     public String callRegisterService(@RequestBody MemberDto.RequestDto dto, RedirectAttributes attributes) {
         if (memberService.register(dto)) {
@@ -37,5 +42,16 @@ public class MemberViewController {
 
         attributes.addFlashAttribute("message", "회원가입이 실패했습니다!");
         return "redirect:/member/register";
+    }
+
+    @PostMapping("/change/password")
+    public String callModifyService(@RequestBody MemberDto.ChangePasswordRequestDto dto, RedirectAttributes attributes) {
+        if (memberService.changePassword(dto)) {
+            attributes.addFlashAttribute("message", "비밀번호 변경이 성공했습니다! 다시 로그인해주세요.");
+            return "redirect:/member/login";
+        }
+
+        attributes.addFlashAttribute("message", "비밀번호 변경이 실패했습니다!");
+        return "redirect:/member/change/password";
     }
 }

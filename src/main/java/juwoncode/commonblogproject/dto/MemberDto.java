@@ -33,4 +33,21 @@ public class MemberDto {
         private String username;
         private String password;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class ChangePasswordRequestDto {
+        private String username;
+        private String originPassword;
+        private String changePassword;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class WithdrawRequestDto {
+        private String username;
+        private String password;
+    }
 }
