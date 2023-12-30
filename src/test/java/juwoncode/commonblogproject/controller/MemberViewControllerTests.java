@@ -54,4 +54,35 @@ public class MemberViewControllerTests {
                 .andExpect(redirectedUrl("/member/register"))
                 .andExpect(flash().attribute("message", "회원가입이 실패했습니다!"));
     }
+
+    @DisplayName("비밀번호 수정 서비스 호출 테스트 (성공)")
+    @Test
+    void test_callChangePasswordService_when_success() throws Exception {
+        MemberDto.ChangePasswordRequestDto dto =
+                new MemberDto.ChangePasswordRequestDto("username", "original", "change");
+        given(memberService.changePassword(any(MemberDto.ChangePasswordRequestDto.class))).willReturn(true);
+
+        mockMvc.perform(post("/member/change/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/member/login"))
+                .andExpect(flash().attribute("message", "비밀번호 변경이 성공했습니다! 다시 로그인해주세요."));
+    }
+
+    @DisplayName("비밀번호 수정 서비스 호출 테스트 (실패)")
+    @Test
+    void test_callChangePasswordService_when_failure() throws Exception {
+        MemberDto.ChangePasswordRequestDto dto =
+                new MemberDto.ChangePasswordRequestDto("username", "original", "change");
+        given(memberService.changePassword(any(MemberDto.ChangePasswordRequestDto.class))).willReturn(false);
+
+        mockMvc.perform(post("/member/change/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/member/change/password"))
+                .andExpect(flash().attribute("message", "비밀번호 변경이 실패했습니다!"));
+    }
+
 }
