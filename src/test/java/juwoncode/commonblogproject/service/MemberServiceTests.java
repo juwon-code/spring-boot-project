@@ -94,4 +94,27 @@ public class MemberServiceTests {
         boolean result = memberService.withdraw(dto);
         assertThat(result).isFalse();
     }
+
+    @DisplayName("아이디 중복 검사 서비스 테스트 (성공)")
+    @Test
+    void test_checkUsername_when_success() {
+        String username = "username";
+
+        when(memberRepository.existsMemberByUsername(anyString())).thenReturn(false);
+
+        boolean result = memberService.checkUsername(username);
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("아이디 중복 검사 서비스 테스트 (실패)")
+    @Test
+    void test_checkUsername_when_failure() {
+        String username = "username";
+
+        when(memberRepository.existsMemberByUsername(anyString())).thenReturn(true);
+
+        boolean result = memberService.checkUsername(username);
+        assertThat(result).isFalse();
+    }
+    
 }

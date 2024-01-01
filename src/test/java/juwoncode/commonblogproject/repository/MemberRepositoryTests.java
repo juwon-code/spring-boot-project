@@ -66,4 +66,20 @@ public class MemberRepositoryTests {
 
         assertThat(result).isZero();
     }
+
+    @DisplayName("회원존재 쿼리 테스트 : 아이디 (존재함)")
+    @Test
+    void test_existsMemberByUsername_when_exists() {
+        boolean result = memberRepository.existsMemberByUsername("username");
+
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("회원존재 쿼리 테스트 : 아이디 (존재하지않음)")
+    @Test
+    void test_existsMemberByUsername_when_notExists() {
+        boolean result = memberRepository.existsMemberByUsername("usernameValid");
+
+        assertThat(result).isFalse();
+    }
 }
