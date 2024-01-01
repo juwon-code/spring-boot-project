@@ -63,4 +63,16 @@ public class MemberServiceImpl implements MemberService {
         return true;
     }
 
+    @Override
+    public boolean checkUsername(String username) {
+        boolean result = memberRepository.existsMemberByUsername(username);
+
+        if (result) {
+            logger.info("This username already used: {}", username);
+            return false;
+        }
+
+        logger.info("This username can be used: {}", username);
+        return true;
+    }
 }
