@@ -1,8 +1,8 @@
 package juwoncode.commonblogproject.service;
 
 import juwoncode.commonblogproject.domain.Member;
-import juwoncode.commonblogproject.dto.MemberDto;
 import juwoncode.commonblogproject.repository.MemberRepository;
+import juwoncode.commonblogproject.request.MemberRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +27,7 @@ public class MemberServiceTests {
     @DisplayName("회원가입 서비스 테스트 (성공)")
     @Test
     void test_register_when_success() {
-        MemberDto.RequestDto dto = mock(MemberDto.RequestDto.class);
+        MemberRequest.RegisterDto dto = mock(MemberRequest.RegisterDto.class);
         Member member = mock(Member.class);
 
         when(memberRepository.save(any(Member.class))).thenReturn(member);
@@ -39,7 +39,7 @@ public class MemberServiceTests {
     @DisplayName("회원가입 서비스 테스트 (실패)")
     @Test
     void test_register_when_failure() {
-        MemberDto.RequestDto dto = mock(MemberDto.RequestDto.class);
+        MemberRequest.RegisterDto dto = mock(MemberRequest.RegisterDto.class);
 
         when(memberRepository.save(any(Member.class))).thenThrow(IllegalArgumentException.class);
 
@@ -50,8 +50,8 @@ public class MemberServiceTests {
     @DisplayName("비밀번호 변경 서비스 테스트 (성공)")
     @Test
     void test_changePassword_when_success() {
-        MemberDto.ChangePasswordRequestDto dto =
-                new MemberDto.ChangePasswordRequestDto("username", "oldpass", "newpass");
+        MemberRequest.ChangePasswordDto dto =
+                new MemberRequest.ChangePasswordDto("username", "oldpass", "newpass");
         Member member = mock(Member.class);
 
         when(memberRepository.findMemberByUsernameAndPassword(anyString(), anyString())).thenReturn(Optional.of(member));
@@ -63,8 +63,8 @@ public class MemberServiceTests {
     @DisplayName("비밀번호 변경 서비스 테스트 (실패)")
     @Test
     void test_changePassword_when_failure() {
-        MemberDto.ChangePasswordRequestDto dto =
-                new MemberDto.ChangePasswordRequestDto("username", "oldpass", "newpass");
+        MemberRequest.ChangePasswordDto dto =
+                new MemberRequest.ChangePasswordDto("username", "oldpass", "newpass");
 
         when(memberRepository.findMemberByUsernameAndPassword(anyString(), anyString()))
                 .thenThrow(IllegalArgumentException.class);
@@ -76,7 +76,7 @@ public class MemberServiceTests {
     @DisplayName("회원탈퇴 서비스 테스트 (성공)")
     @Test
     void test_withdraw_when_success() {
-        MemberDto.WithdrawRequestDto dto = new MemberDto.WithdrawRequestDto("username", "password");
+        MemberRequest.WithdrawDto dto = new MemberRequest.WithdrawDto("username", "password");
 
         when(memberRepository.deleteMemberByUsernameAndPassword(anyString(), anyString())).thenReturn(1L);
 
@@ -87,7 +87,7 @@ public class MemberServiceTests {
     @DisplayName("회원탈퇴 서비스 테스트 (실패)")
     @Test
     void test_withdraw_when_failure() {
-        MemberDto.WithdrawRequestDto dto = new MemberDto.WithdrawRequestDto("username", "password");
+        MemberRequest.WithdrawDto dto = new MemberRequest.WithdrawDto("username", "password");
 
         when(memberRepository.deleteMemberByUsernameAndPassword(anyString(), anyString())).thenReturn(0L);
 

@@ -1,7 +1,7 @@
 package juwoncode.commonblogproject.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import juwoncode.commonblogproject.dto.MemberDto;
+import juwoncode.commonblogproject.request.MemberRequest;
 import juwoncode.commonblogproject.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,9 +27,9 @@ public class MemberViewControllerTests {
     @DisplayName("회원가입 서비스 호출 테스트 (성공)")
     @Test
     void test_callRegisterService_when_success() throws Exception {
-        MemberDto.RequestDto dto =
-                new MemberDto.RequestDto("username", "password", "username@email.com");
-        given(memberService.register(any(MemberDto.RequestDto.class))).willReturn(true);
+        MemberRequest.RegisterDto dto =
+                new MemberRequest.RegisterDto("username", "password", "username@email.com");
+        given(memberService.register(any(MemberRequest.RegisterDto.class))).willReturn(true);
 
         mockMvc.perform(post("/member/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -43,9 +43,9 @@ public class MemberViewControllerTests {
     @DisplayName("회원가입 서비스 호출 테스트 (실패)")
     @Test
     void test_callRegisterService_when_failure() throws Exception {
-        MemberDto.RequestDto dto =
-                new MemberDto.RequestDto("username", "password", "username@email.com");
-        given(memberService.register(any(MemberDto.RequestDto.class))).willReturn(false);
+        MemberRequest.RegisterDto dto =
+                new MemberRequest.RegisterDto("username", "password", "username@email.com");
+        given(memberService.register(any(MemberRequest.RegisterDto.class))).willReturn(false);
 
         mockMvc.perform(post("/member/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -58,9 +58,9 @@ public class MemberViewControllerTests {
     @DisplayName("비밀번호 수정 서비스 호출 테스트 (성공)")
     @Test
     void test_callChangePasswordService_when_success() throws Exception {
-        MemberDto.ChangePasswordRequestDto dto =
-                new MemberDto.ChangePasswordRequestDto("username", "original", "change");
-        given(memberService.changePassword(any(MemberDto.ChangePasswordRequestDto.class))).willReturn(true);
+        MemberRequest.ChangePasswordDto dto =
+                new MemberRequest.ChangePasswordDto("username", "original", "change");
+        given(memberService.changePassword(any(MemberRequest.ChangePasswordDto.class))).willReturn(true);
 
         mockMvc.perform(post("/member/change/password")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -73,9 +73,9 @@ public class MemberViewControllerTests {
     @DisplayName("비밀번호 수정 서비스 호출 테스트 (실패)")
     @Test
     void test_callChangePasswordService_when_failure() throws Exception {
-        MemberDto.ChangePasswordRequestDto dto =
-                new MemberDto.ChangePasswordRequestDto("username", "original", "change");
-        given(memberService.changePassword(any(MemberDto.ChangePasswordRequestDto.class))).willReturn(false);
+        MemberRequest.ChangePasswordDto dto =
+                new MemberRequest.ChangePasswordDto("username", "original", "change");
+        given(memberService.changePassword(any(MemberRequest.ChangePasswordDto.class))).willReturn(false);
 
         mockMvc.perform(post("/member/change/password")
                         .contentType(MediaType.APPLICATION_JSON)

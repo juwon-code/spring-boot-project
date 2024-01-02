@@ -1,8 +1,8 @@
 package juwoncode.commonblogproject.service;
 
 import juwoncode.commonblogproject.domain.Member;
-import juwoncode.commonblogproject.dto.MemberDto;
 import juwoncode.commonblogproject.repository.MemberRepository;
+import juwoncode.commonblogproject.request.MemberRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public boolean register(MemberDto.RequestDto dto) {
+    public boolean register(MemberRequest.RegisterDto dto) {
         Member member = Member.builder()
                 .username(dto.getUsername())
                 .password(dto.getPassword())
@@ -36,11 +36,11 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public boolean changePassword(MemberDto.ChangePasswordRequestDto dto) {
+    public boolean changePassword(MemberRequest.ChangePasswordDto dto) {
         try {
-            Member member = memberRepository.findMemberByUsernameAndPassword(dto.getUsername(), dto.getOriginPassword())
+            Member member = memberRepository.findMemberByUsernameAndPassword(dto.getUsername(), dto.getOldPassword())
                     .orElseThrow(NoSuchElementException::new);
-            member.setPassword(dto.getChangePassword());
+            member.setPassword(dto.getNewPassword());
             memberRepository.save(member);
             logger.info("Successfully change Member password");
             return true;
@@ -51,7 +51,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public boolean withdraw(MemberDto.WithdrawRequestDto dto) {
+    public boolean withdraw(MemberRequest.WithdrawDto dto) {
         Long deletedCount = memberRepository.deleteMemberByUsernameAndPassword(dto.getUsername(), dto.getPassword());
 
         if (deletedCount != 1) {

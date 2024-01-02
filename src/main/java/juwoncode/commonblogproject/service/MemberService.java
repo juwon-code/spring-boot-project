@@ -1,10 +1,10 @@
 package juwoncode.commonblogproject.service;
 
-import juwoncode.commonblogproject.dto.MemberDto;
+import juwoncode.commonblogproject.request.MemberRequest;
 
 public interface MemberService {
-    boolean register(MemberDto.RequestDto dto);
-    boolean withdraw(MemberDto.WithdrawRequestDto dto);
-    boolean changePassword(MemberDto.ChangePasswordRequestDto dto);
+    boolean register(MemberRequest.RegisterDto dto);
+    boolean withdraw(MemberRequest.WithdrawDto dto);
+    boolean changePassword(MemberRequest.ChangePasswordDto dto);
     boolean checkUsername(String username);
 }
