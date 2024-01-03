@@ -1,5 +1,6 @@
 package juwoncode.commonblogproject.controller;
 
+import juwoncode.commonblogproject.response.ApiResponse;
 import juwoncode.commonblogproject.service.MemberService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +16,11 @@ public class MemberApiController {
     }
 
     @GetMapping("/register/check/{username}")
-    public ResponseEntity<String> checkRegister(@PathVariable String username) {
+    public ApiResponse.OnlyMessageDto checkRegister(@PathVariable String username) {
         if (memberService.checkUsername(username)) {
-            return new ResponseEntity<>("사용가능한 아이디 입니다.", HttpStatus.OK);
+            return new ApiResponse.OnlyMessageDto(HttpStatus.OK.value(), "사용가능한 아이디 입니다.");
         }
 
-        return new ResponseEntity<>("중복된 회원 아이디 입니다.", HttpStatus.OK);
+        return new ApiResponse.OnlyMessageDto(HttpStatus.OK.value(), "중복된 회원 아이디 입니다.");
     }
 }
