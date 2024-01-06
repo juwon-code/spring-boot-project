@@ -6,11 +6,158 @@
     <header th:replace="~{layout/fragments :: fragment-header}">
     </header>
 
-    <div class="container">
-        This is Register Page
+    <div class="container-fluid" style="height: 1000px; margin-top: 150px; margin-bottom: 150px;">
+        <div class="d-flex justify-content-center align-items-center">
+            <div class="m-5" style="width: 480px;">
+                <div class="mb-3 text-center">
+                    <h3 class="text-dark">Register</h3>
+                </div>
+                <form id="form-register" th:method="POST" th:action="@{~/member/register}">
+                    <div class="mb-1 form-floating">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="ID">
+                        <label for="username">ID</label>
+                    </div>
+                    <div class="mb-2">
+                        <span class="text-danger" id="error-username"></span>
+                    </div>
+                    <div class="mb-2 form-floating">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                        <label for="password">Password</label>
+                    </div>
+                    <div class="mb-1 form-floating">
+                        <input type="password" class="form-control" id="password-check" name="password-check" placeholder="Password Check">
+                        <label for="password">Password Check</label>
+                    </div>
+                    <div class="mb-2">
+                        <span class="text-danger" id="error-password"></span>
+                    </div>
+                    <div class="mb-1 form-floating">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Email Address">
+                        <label for="email">Email Address</label>
+                    </div>
+                    <div class="mb-2">
+                        <span class="text-danger" id="error-email"></span>
+                    </div>
+                    <div class="mb-2">
+                        <button type="button" class="form-control btn btn-primary btn-lg" id="register-button">Register</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <footer th:replace="~{layout/fragments :: fragment-footer}">
     </footer>
+
+    <script>
+        const button = document.getElementById('register-button');
+
+        button.addEventListener('click', () => {
+            checkParameter();
+        });
+
+        function checkParameter() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const passwordCheck = document.getElementById('password-check').value;
+            const email = document.getElementById('email').value;
+            let isValid = true;
+
+            if (!checkUsername(username)) {
+                isValid = false;
+            }
+
+            if (!checkPassword(password, passwordCheck)) {
+                isValid = false;
+            }
+
+            if (!checkEmail(email)) {
+                isValid = false;
+            }
+
+            if (isValid === true) {
+                const form = document.getElementById('form-register');
+                form.submit();
+            }
+        }
+
+        async function checkUsername(username) {
+            const span = document.getElementById('error-username');
+
+            // 유저명 조건 확인 (6 ~ 20자 이내 영문자)
+            const regExp = /^[a-z]+[a-z0-9]{5,19}$/g;
+            if (!regExp.test(username)) {
+                changeErrorSpan(span, '유저명은 6 ~ 20자 이내의 영문자만 사용할 수 있습니다.');
+                return false;
+            }
+
+            // 유저명 중복 확인
+            const isDuplicate = await checkUsernameDuplication(username);
+            if (!isDuplicate) {
+                changeErrorSpan(span, "중복된 유저명을 사용할 수 없습니다.");
+                return false;
+            }
+
+            changeErrorSpan(span, "사용가능한 아이디 입니다.");
+            return true;
+        }
+
+        function checkPassword(password, passwordCheck) {
+            const span = document.getElementById('error-password');
+
+            // 비밀번호 조건 확인 (최소 8자, 영대소문자+특수기호+숫자)
+            const regExp = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/g;
+            if (!regExp.test(password)) {
+                changeErrorSpan(span, '비밀번호는 8자 이상의 영대소문자, 특수기호, 숫자를 포함한 문자열입니다.');
+                return false;
+            }
+
+            // 비밀번호 일치 확인
+            if (!(password === passwordCheck)) {
+                changeErrorSpan(span, '비밀번호가 일치하지 않습니다.');
+                return false;
+            }
+
+            changeErrorSpan(span, "비밀번호가 일치합니다.");
+            return true;
+        }
+
+        async function checkEmail(email) {
+            const span = document.getElementById('error-email');
+
+            // 이메일 조건 확인
+            const regExp = /^[a-zA-Z0-9+-\_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/g;
+            if (!regExp.test(email)) {
+                changeErrorSpan(span, '올바른 이메일 형식이 아닙니다.');
+                return false;
+            }
+
+            // 유저명 중복 확인
+            const isDuplicate = await checkEmailDuplication(email);
+            if (!isDuplicate) {
+                changeErrorSpan(span, "중복된 이메일을 사용할 수 없습니다.");
+                return false;
+            }
+
+            changeErrorSpan(span, "사용가능한 이메일 입니다.");
+            return true;
+        }
+
+        async function checkUsernameDuplication(username) {
+            const response = await fetch('/api/member/register/check/' + username);
+            const result = await response.json();
+            return (result.message === "사용가능한 아이디 입니다.");
+        }
+
+        async function checkEmailDuplication(email) {
+            const response = await fetch('/api/member/register/check-email/' + email);
+            const result = await response.json();
+            return (result.message === "사용가능한 이메일 입니다.");
+        }
+
+        function changeErrorSpan(span, message) {
+            span.innerHTML = message;
+        }
+    </script>
 </body>
 </html>
