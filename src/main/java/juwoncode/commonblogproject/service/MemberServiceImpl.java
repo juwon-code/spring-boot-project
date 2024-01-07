@@ -75,4 +75,17 @@ public class MemberServiceImpl implements MemberService {
         logger.info("This username can be used: {}", username);
         return true;
     }
+
+    @Override
+    public boolean checkEmail(String email) {
+        boolean result = memberRepository.existsMemberByEmail(email);
+
+        if (result) {
+            logger.info("This email already used: {}", email);
+            return false;
+        }
+
+        logger.info("This email can be used: {}", email);
+        return true;
+    }
 }

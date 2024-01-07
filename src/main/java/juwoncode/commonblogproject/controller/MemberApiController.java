@@ -15,12 +15,21 @@ public class MemberApiController {
         this.memberService = memberService;
     }
 
-    @GetMapping("/register/check/{username}")
-    public ApiResponse.OnlyMessageDto checkRegister(@PathVariable String username) {
+    @GetMapping("/register/check-username/{username}")
+    public ApiResponse.OnlyMessageDto callCheckUsernameService(@PathVariable String username) {
         if (memberService.checkUsername(username)) {
             return new ApiResponse.OnlyMessageDto(HttpStatus.OK.value(), "사용가능한 아이디 입니다.");
         }
 
         return new ApiResponse.OnlyMessageDto(HttpStatus.OK.value(), "중복된 회원 아이디 입니다.");
+    }
+
+    @GetMapping("/register/check-email/{email}")
+    public ApiResponse.OnlyMessageDto callCheckEmailService(@PathVariable String email) {
+        if (memberService.checkEmail(email)) {
+            return new ApiResponse.OnlyMessageDto(HttpStatus.OK.value(), "사용가능한 이메일 입니다.");
+        }
+
+        return new ApiResponse.OnlyMessageDto(HttpStatus.OK.value(), "중복된 이메일 입니다.");
     }
 }

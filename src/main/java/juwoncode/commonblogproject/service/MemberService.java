@@ -7,4 +7,5 @@ public interface MemberService {
     boolean withdraw(MemberRequest.WithdrawDto dto);
     boolean changePassword(MemberRequest.ChangePasswordDto dto);
     boolean checkUsername(String username);
+    boolean checkEmail(String email);
 }
