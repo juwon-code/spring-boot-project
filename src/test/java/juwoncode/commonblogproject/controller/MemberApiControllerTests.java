@@ -23,12 +23,12 @@ public class MemberApiControllerTests {
 
     @DisplayName("아이디 중복 검사 서비스 호출 테스트 (성공)")
     @Test
-    void test_checkRegister_when_success() throws Exception {
+    void test_callCheckUsernameService_when_success() throws Exception {
         String username = "username";
 
         when(memberService.checkUsername(anyString())).thenReturn(true);
 
-        mockMvc.perform(get("/api/member/register/check/" + username))
+        mockMvc.perform(get("/api/member/register/check-username/" + username))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.message").value("사용가능한 아이디 입니다."));
@@ -38,16 +38,46 @@ public class MemberApiControllerTests {
 
     @DisplayName("아이디 중복 검사 서비스 호출 테스트 (실패)")
     @Test
-    void test_checkRegister_when_failure() throws Exception {
+    void test_callCheckUsernameService_when_failure() throws Exception {
         String username = "username";
 
         when(memberService.checkUsername(anyString())).thenReturn(false);
 
-        mockMvc.perform(get("/api/member/register/check/" + username))
+        mockMvc.perform(get("/api/member/register/check-username/" + username))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.message").value("중복된 회원 아이디 입니다."));
 
         verify(memberService).checkUsername(username);
+    }
+
+    @DisplayName("이메일 중복 검사 서비스 호출 테스트 (성공)")
+    @Test
+    void test_callCheckEmailService_when_success() throws Exception {
+        String email = "aa@aa.aa";
+
+        when(memberService.checkEmail(anyString())).thenReturn(true);
+
+        mockMvc.perform(get("/api/member/register/check-email/" + email))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.message").value("사용가능한 이메일 입니다."));
+
+        verify(memberService).checkEmail(email);
+    }
+
+    @DisplayName("이메일 중복 검사 서비스 호출 테스트 (실패)")
+    @Test
+    void test_callCheckEmailService_when_failure() throws Exception {
+        String email = "aa@aa.aa";
+
+        when(memberService.checkEmail(anyString())).thenReturn(false);
+
+        mockMvc.perform(get("/api/member/register/check-email/" + email))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.message").value("중복된 이메일 입니다."));
+
+        verify(memberService).checkEmail(email);
     }
 }

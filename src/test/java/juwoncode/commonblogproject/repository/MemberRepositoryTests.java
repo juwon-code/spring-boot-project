@@ -82,4 +82,20 @@ public class MemberRepositoryTests {
 
         assertThat(result).isFalse();
     }
+
+    @DisplayName("회원존재 쿼리 테스트 : 이메일 (존재함)")
+    @Test
+    void test_existsMemberByEmail_when_exists() {
+        boolean result = memberRepository.existsMemberByEmail("username@email.com");
+
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("회원존재 쿼리 테스트 : 이메일 (존재하지않음)")
+    @Test
+    void test_existsMemberByEmail_when_notExists() {
+        boolean result = memberRepository.existsMemberByEmail("username1@email.com");
+
+        assertThat(result).isFalse();
+    }
 }

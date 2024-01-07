@@ -116,5 +116,26 @@ public class MemberServiceTests {
         boolean result = memberService.checkUsername(username);
         assertThat(result).isFalse();
     }
-    
+
+    @DisplayName("이메일 중복 검사 서비스 테스트 (성공)")
+    @Test
+    void test_checkEmail_when_success() {
+        String email = "aaa@email.com";
+
+        when(memberRepository.existsMemberByEmail(anyString())).thenReturn(false);
+
+        boolean result = memberService.checkEmail(email);
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("이메일 중복 검사 서비스 테스트 (실패)")
+    @Test
+    void test_checkEmail_when_failure() {
+        String email = "aaa@email.com";
+
+        when(memberRepository.existsMemberByEmail(anyString())).thenReturn(true);
+
+        boolean result = memberService.checkEmail(email);
+        assertThat(result).isFalse();
+    }
 }
