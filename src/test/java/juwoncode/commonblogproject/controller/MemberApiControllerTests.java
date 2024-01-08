@@ -45,7 +45,7 @@ public class MemberApiControllerTests {
 
         mockMvc.perform(get("/api/member/register/check-username/" + username))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.code").value(409))
                 .andExpect(jsonPath("$.message").value("중복된 회원 아이디 입니다."));
 
         verify(memberService).checkUsername(username);
@@ -75,7 +75,7 @@ public class MemberApiControllerTests {
 
         mockMvc.perform(get("/api/member/register/check-email/" + email))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.code").value(409))
                 .andExpect(jsonPath("$.message").value("중복된 이메일 입니다."));
 
         verify(memberService).checkEmail(email);

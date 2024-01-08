@@ -33,8 +33,13 @@ public class MemberViewController {
         return "member/change/password";
     }
 
+    @GetMapping("/validate/email")
+    public String getValidateEmailPage() {
+        return "member/validate/email";
+    }
+
     @PostMapping("/register")
-    public String callRegisterService(@RequestBody MemberRequest.RegisterDto dto, RedirectAttributes attributes) {
+    public String callRegisterService(MemberRequest.RegisterDto dto, RedirectAttributes attributes) {
         if (memberService.register(dto)) {
             attributes.addFlashAttribute("message","회원가입이 성공했습니다!");
             return "redirect:/member/validate/email";
@@ -45,7 +50,7 @@ public class MemberViewController {
     }
 
     @PostMapping("/change/password")
-    public String callModifyService(@RequestBody MemberRequest.ChangePasswordDto dto, RedirectAttributes attributes) {
+    public String callModifyService(MemberRequest.ChangePasswordDto dto, RedirectAttributes attributes) {
         if (memberService.changePassword(dto)) {
             attributes.addFlashAttribute("message", "비밀번호 변경이 성공했습니다! 다시 로그인해주세요.");
             return "redirect:/member/login";
