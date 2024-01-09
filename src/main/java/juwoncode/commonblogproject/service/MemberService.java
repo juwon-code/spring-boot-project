@@ -1,6 +1,6 @@
 package juwoncode.commonblogproject.service;
 
-import juwoncode.commonblogproject.request.MemberRequest;
+import juwoncode.commonblogproject.dto.MemberRequest;
 
 public interface MemberService {
     boolean register(MemberRequest.RegisterDto dto);

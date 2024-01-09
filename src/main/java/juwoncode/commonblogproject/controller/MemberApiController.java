@@ -1,6 +1,6 @@
 package juwoncode.commonblogproject.controller;
 
-import juwoncode.commonblogproject.response.ApiResponse;
+import juwoncode.commonblogproject.dto.ApiResponse;
 import juwoncode.commonblogproject.service.MemberService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

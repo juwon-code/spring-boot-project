@@ -1,4 +1,4 @@
-package juwoncode.commonblogproject.request;
+package juwoncode.commonblogproject.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

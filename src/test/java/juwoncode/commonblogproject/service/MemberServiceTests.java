@@ -2,7 +2,7 @@ package juwoncode.commonblogproject.service;
 
 import juwoncode.commonblogproject.domain.Member;
 import juwoncode.commonblogproject.repository.MemberRepository;
-import juwoncode.commonblogproject.request.MemberRequest;
+import juwoncode.commonblogproject.dto.MemberRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

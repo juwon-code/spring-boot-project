@@ -1,7 +1,7 @@
 package juwoncode.commonblogproject.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import juwoncode.commonblogproject.request.MemberRequest;
+import juwoncode.commonblogproject.dto.MemberRequest;
 import juwoncode.commonblogproject.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -2,7 +2,7 @@ package juwoncode.commonblogproject.service;
 
 import juwoncode.commonblogproject.domain.Member;
 import juwoncode.commonblogproject.repository.MemberRepository;
-import juwoncode.commonblogproject.request.MemberRequest;
+import juwoncode.commonblogproject.dto.MemberRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
