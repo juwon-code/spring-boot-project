@@ -30,6 +30,7 @@ public class MemberDetailsService implements UserDetailsService {
                 .username(member.getUsername())
                 .password(member.getPassword())
                 .email(member.getEmail())
+                .role(member.getRole())
                 .build();
     }
 }
