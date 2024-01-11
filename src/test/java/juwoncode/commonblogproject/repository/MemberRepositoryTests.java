@@ -1,14 +1,13 @@
 package juwoncode.commonblogproject.repository;
 
 import juwoncode.commonblogproject.domain.Member;
+import juwoncode.commonblogproject.vo.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,6 +24,7 @@ public class MemberRepositoryTests {
                 .username("username")
                 .password("password")
                 .email("username@email.com")
+                .role(Role.USER)
                 .build();
 
         memberRepository.save(member);
@@ -39,14 +39,15 @@ public class MemberRepositoryTests {
         assertThat(result.getUsername()).isEqualTo("username");
         assertThat(result.getPassword()).isEqualTo("password");
         assertThat(result.getEmail()).isEqualTo("username@email.com");
-
+        assertThat(result.getRole()).isEqualTo(Role.USER);
+        assertThat(result.isEnabled()).isFalse();
     }
 
     @DisplayName("회원조회 쿼리 테스트 : 아이디, 비밀번호 (실패)")
     @Test
     void test_findMemberByUsernameAndPassword_when_failure() {
         assertThatThrownBy(() -> {
-            Member result = memberRepository.findMemberByUsernameAndPassword("username1", "password")
+            memberRepository.findMemberByUsernameAndPassword("username1", "password")
                     .orElseThrow(IllegalArgumentException::new);
         }).isInstanceOf(IllegalArgumentException.class);
     }
