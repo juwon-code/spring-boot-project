@@ -3,25 +3,25 @@ package juwoncode.commonblogproject.domain;
 import jakarta.persistence.*;
 import juwoncode.commonblogproject.vo.Role;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "member")
 @Getter
+@Setter
 @NoArgsConstructor
 public class Member extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
     private Long id;
-    @Setter
     private String username;
-    @Setter
     private String password;
-    @Setter
     private String email;
     @Enumerated(EnumType.STRING)
-    @Setter
     private Role role;
+    @ColumnDefault("false")
+    private boolean enabled;
 
     @Builder
     public Member(String username, String password, String email, Role role) {
