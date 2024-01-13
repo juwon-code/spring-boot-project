@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 
+import static juwoncode.commonblogproject.vo.LoggerMessage.*;
+
 @Service
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
@@ -29,10 +31,10 @@ public class MemberServiceImpl implements MemberService {
 
         try {
             memberRepository.save(member);
-            logger.info("Successfully save new member: {}", dto.getUsername());
+            logger.info(REGISTER_SERVICE_SUCCESS_LOG, dto.getUsername());
             return true;
         } catch (IllegalArgumentException e) {
-            logger.info("Cannot save Member with empty params");
+            logger.info(REGISTER_SERVICE_FAILURE_LOG, dto.getUsername());
             return false;
         }
     }
@@ -44,10 +46,10 @@ public class MemberServiceImpl implements MemberService {
                     .orElseThrow(NoSuchElementException::new);
             member.setPassword(dto.getNewPassword());
             memberRepository.save(member);
-            logger.info("Successfully change Member password");
+            logger.info(CHANGE_PASSWORD_SERVICE_SUCCESS_LOG, dto.getUsername());
             return true;
         } catch (IllegalArgumentException e) {
-            logger.info("Cannot change password with invalid param");
+            logger.info(CHANGE_PASSWORD_SERVICE_FAILURE_LOG, dto.getUsername());
             return false;
         }
     }
@@ -57,11 +59,11 @@ public class MemberServiceImpl implements MemberService {
         Long deletedCount = memberRepository.deleteMemberByUsernameAndPassword(dto.getUsername(), dto.getPassword());
 
         if (deletedCount != 1) {
-            logger.info("Cannot delete Member: {}", dto.getUsername());
+            logger.info(WITHDRAW_SERVICE_SUCCESS_LOG, dto.getUsername());
             return false;
         }
 
-        logger.info("Successfully delete Member: {}", dto.getUsername());
+        logger.info(WITHDRAW_SERVICE_FAILURE_LOG, dto.getUsername());
         return true;
     }
 
@@ -70,11 +72,11 @@ public class MemberServiceImpl implements MemberService {
         boolean result = memberRepository.existsMemberByUsername(username);
 
         if (result) {
-            logger.info("This username already used: {}", username);
+            logger.info(CHECK_USERNAME_SERVICE_SUCCESS_LOG, username);
             return false;
         }
 
-        logger.info("This username can be used: {}", username);
+        logger.info(CHECK_USERNAME_SERVICE_FAILURE_LOG, username);
         return true;
     }
 
@@ -83,11 +85,11 @@ public class MemberServiceImpl implements MemberService {
         boolean result = memberRepository.existsMemberByEmail(email);
 
         if (result) {
-            logger.info("This email already used: {}", email);
+            logger.info(CHECK_EMAIL_SERVICE_SUCCESS_LOG, email);
             return false;
         }
 
-        logger.info("This email can be used: {}", email);
+        logger.info(CHECK_EMAIL_SERVICE_FAILURE_LOG, email);
         return true;
     }
 }

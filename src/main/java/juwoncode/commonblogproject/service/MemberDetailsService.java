@@ -10,6 +10,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import static juwoncode.commonblogproject.vo.ExceptionMessage.*;
+import static juwoncode.commonblogproject.vo.LoggerMessage.*;
+
 @Service
 public class MemberDetailsService implements UserDetailsService {
     private final MemberRepository memberRepository;
@@ -22,10 +25,11 @@ public class MemberDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Member member = memberRepository.findMemberByUsername(username).orElseThrow(() -> {
-            logger.info("Cannot found any member with username: {}", username);
-            return new UsernameNotFoundException("일치하는 회원을 찾을 수 없습니다.");
+            logger.info(FIND_MEMBER_WITH_USERNAME_SUCCESS_LOG, username);
+            return new UsernameNotFoundException(USERNAME_NOT_EXISTS_EXCEPTION);
         });
 
+        logger.info(FIND_MEMBER_WITH_USERNAME_FAILURE_LOG, username);
         return MemberDetails.builder()
                 .username(member.getUsername())
                 .password(member.getPassword())
