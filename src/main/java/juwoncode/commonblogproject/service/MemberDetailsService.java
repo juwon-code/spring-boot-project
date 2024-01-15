@@ -23,19 +23,22 @@ public class MemberDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = memberRepository.findMemberByUsername(username).orElseThrow(() -> {
-            logger.info(FIND_MEMBER_WITH_USERNAME_SUCCESS_LOG, username);
-            return new UsernameNotFoundException(USERNAME_NOT_EXISTS_EXCEPTION);
-        });
+    public UserDetails loadUserByUsername(String username) {
+        try {
+            Member member = memberRepository.findMemberByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException(FIND_MEMBER_WITH_USERNAME_FAILURE_LOG));
 
-        logger.info(FIND_MEMBER_WITH_USERNAME_FAILURE_LOG, username);
-        return MemberDetails.builder()
-                .username(member.getUsername())
-                .password(member.getPassword())
-                .email(member.getEmail())
-                .role(member.getRole())
-                .enabled(member.isEnabled())
-                .build();
+            logger.info(FIND_MEMBER_WITH_USERNAME_SUCCESS_LOG + username);
+            return MemberDetails.builder()
+                    .username(username)
+                    .password(member.getPassword())
+                    .email(member.getEmail())
+                    .role(member.getRole())
+                    .enabled(member.isEnabled())
+                    .build();
+        } catch (UsernameNotFoundException e) {
+            logger.info(FIND_MEMBER_WITH_USERNAME_FAILURE_LOG + username);
+            throw e;
+        }
     }
 }

@@ -18,7 +18,7 @@ public class MemberApiController {
 
     @GetMapping("/register/check-username/{username}")
     public ApiResponse.OnlyMessageDto callCheckUsernameService(@PathVariable String username) {
-        if (!memberService.checkUsername(username)) {
+        if (!memberService.checkUsernameDuplicated(username)) {
             return new ApiResponse.OnlyMessageDto(HTTP_STATUS_CONFLICT, USERNAME_DUPLICATE_MESSAGE);
         }
 
@@ -27,7 +27,7 @@ public class MemberApiController {
 
     @GetMapping("/register/check-email/{email}")
     public ApiResponse.OnlyMessageDto callCheckEmailService(@PathVariable String email) {
-        if (!memberService.checkEmail(email)) {
+        if (!memberService.checkEmailDuplicated(email)) {
             return new ApiResponse.OnlyMessageDto(HTTP_STATUS_CONFLICT, EMAIL_DUPLICATE_MESSAGE);
         }
 

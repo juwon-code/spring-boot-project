@@ -15,11 +15,19 @@ public class Member extends BaseTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
     private Long id;
+
+    @Column(length = 20, unique = true, nullable = false)
     private String username;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
     @Enumerated(EnumType.STRING)
     private Role role;
+
     @ColumnDefault("false")
     private boolean enabled;
 

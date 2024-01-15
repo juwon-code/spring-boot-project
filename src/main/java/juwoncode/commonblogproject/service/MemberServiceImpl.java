@@ -1,95 +1,142 @@
 package juwoncode.commonblogproject.service;
 
+import jakarta.transaction.Transactional;
 import juwoncode.commonblogproject.domain.Member;
 import juwoncode.commonblogproject.repository.MemberRepository;
 import juwoncode.commonblogproject.dto.MemberRequest;
 import juwoncode.commonblogproject.vo.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
+import java.util.function.Function;
 
 import static juwoncode.commonblogproject.vo.LoggerMessage.*;
 
 @Service
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    public MemberServiceImpl(MemberRepository memberRepository) {
+
+    public MemberServiceImpl(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
+    @Transactional
     public boolean register(MemberRequest.RegisterDto dto) {
-        Member member = Member.builder()
-                .username(dto.getUsername())
-                .password(dto.getPassword())
-                .email(dto.getEmail())
-                .role(Role.USER)
-                .build();
+        String username = dto.getUsername();
+        String email = dto.getEmail();
+        String password = dto.getPassword();
 
         try {
+            if (checkMemberRegistered(username, email)) {
+                throw new IllegalArgumentException(REGISTER_SERVICE_FAILURE_LOG);
+            }
+
+            Member member = Member.builder()
+                    .username(username)
+                    .password(encryptPassword(password))
+                    .email(email)
+                    .role(Role.USER)
+                    .build();
+
             memberRepository.save(member);
-            logger.info(REGISTER_SERVICE_SUCCESS_LOG, dto.getUsername());
+            logger.info(REGISTER_SERVICE_SUCCESS_LOG, username);
             return true;
         } catch (IllegalArgumentException e) {
-            logger.info(REGISTER_SERVICE_FAILURE_LOG, dto.getUsername());
+            logger.info(e.getMessage(), username);
             return false;
         }
     }
 
+    private boolean checkMemberRegistered(String username, String password) {
+        return memberRepository.existsMemberByUsernameAndEmail(username, password);
+    }
+
     @Override
+    @Transactional
     public boolean changePassword(MemberRequest.ChangePasswordDto dto) {
+        String username = dto.getUsername();
+        String oldPassword = dto.getOldPassword();
+        String newPassword = dto.getNewPassword();
+
         try {
-            Member member = memberRepository.findMemberByUsernameAndPassword(dto.getUsername(), dto.getOldPassword())
-                    .orElseThrow(NoSuchElementException::new);
-            member.setPassword(dto.getNewPassword());
+            Member member = memberRepository.findMemberByUsername(username)
+                    .orElseThrow(() -> new NoSuchElementException(CHANGE_PASSWORD_SERVICE_EMPTY_LOG));
+            String correctPassword = member.getPassword();
+
+            if (!checkPasswordMatched(oldPassword, correctPassword)) {
+                throw new IllegalArgumentException(CHANGE_PASSWORD_SERVICE_WRONG_LOG);
+            }
+
+            member.setPassword(encryptPassword(newPassword));
             memberRepository.save(member);
-            logger.info(CHANGE_PASSWORD_SERVICE_SUCCESS_LOG, dto.getUsername());
+            logger.info(CHANGE_PASSWORD_SERVICE_SUCCESS_LOG, username);
             return true;
-        } catch (IllegalArgumentException e) {
-            logger.info(CHANGE_PASSWORD_SERVICE_FAILURE_LOG, dto.getUsername());
+        } catch (NoSuchElementException | IllegalArgumentException e) {
+            logger.info(e.getMessage(), username);
             return false;
         }
     }
 
+    private String encryptPassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
+    }
+
     @Override
+    @Transactional
     public boolean withdraw(MemberRequest.WithdrawDto dto) {
-        Long deletedCount = memberRepository.deleteMemberByUsernameAndPassword(dto.getUsername(), dto.getPassword());
+        String username = dto.getUsername();
+        String password = dto.getPassword();
 
-        if (deletedCount != 1) {
-            logger.info(WITHDRAW_SERVICE_SUCCESS_LOG, dto.getUsername());
+        try {
+            Member member = memberRepository.findMemberByUsername(username)
+                    .orElseThrow(() -> new NoSuchElementException(WITHDRAW_SERVICE_EMPTY_LOG));
+            String correctPassword = member.getPassword();
+
+            if (!checkPasswordMatched(password, correctPassword)) {
+                throw new IllegalArgumentException(WITHDRAW_SERVICE_WRONG_LOG);
+            }
+
+            memberRepository.deleteMemberByUsernameAndPassword(username, password);
+            logger.info(WITHDRAW_SERVICE_SUCCESS_LOG, username);
+            return true;
+        } catch (NoSuchElementException | IllegalArgumentException e) {
+            logger.info(e.getMessage(), username);
             return false;
         }
+    }
 
-        logger.info(WITHDRAW_SERVICE_FAILURE_LOG, dto.getUsername());
-        return true;
+    private boolean checkPasswordMatched(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
     @Override
-    public boolean checkUsername(String username) {
-        boolean result = memberRepository.existsMemberByUsername(username);
-
-        if (result) {
-            logger.info(CHECK_USERNAME_SERVICE_SUCCESS_LOG, username);
-            return false;
-        }
-
-        logger.info(CHECK_USERNAME_SERVICE_FAILURE_LOG, username);
-        return true;
+    public boolean checkUsernameDuplicated(String username) {
+        return checkDataDuplicated(username, memberRepository::existsMemberByUsername,
+                CHECK_USERNAME_SERVICE_SUCCESS_LOG, CHECK_USERNAME_SERVICE_FAILURE_LOG);
     }
 
     @Override
-    public boolean checkEmail(String email) {
-        boolean result = memberRepository.existsMemberByEmail(email);
+    public boolean checkEmailDuplicated(String email) {
+        return checkDataDuplicated(email, memberRepository::existsMemberByEmail,
+                CHECK_EMAIL_SERVICE_SUCCESS_LOG, CHECK_EMAIL_SERVICE_FAILURE_LOG);
+    }
+
+    private boolean checkDataDuplicated(String data, Function<String, Boolean> checkFunction, String successLog, String failureLog) {
+        boolean result = checkFunction.apply(data);
 
         if (result) {
-            logger.info(CHECK_EMAIL_SERVICE_SUCCESS_LOG, email);
+            logger.info(successLog, data);
             return false;
         }
 
-        logger.info(CHECK_EMAIL_SERVICE_FAILURE_LOG, email);
+        logger.info(failureLog, data);
         return true;
     }
 }
