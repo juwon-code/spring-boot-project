@@ -19,6 +19,7 @@ public class MemberRequest {
     public static class LoginDto {
         @NotEmpty(message = USERNAME_EMPTY_EXCEPTION)
         private String username;
+
         @NotEmpty(message = PASSWORD_EMPTY_EXCEPTION)
         private String password;
     }
@@ -30,9 +31,11 @@ public class MemberRequest {
         @NotEmpty(message = USERNAME_EMPTY_EXCEPTION)
         @Pattern(regexp = USERNAME_PATTERN, message = USERNAME_WRONG_EXCEPTION)
         private String username;
+
         @NotEmpty(message = PASSWORD_EMPTY_EXCEPTION)
         @Pattern(regexp = PASSWORD_PATTERN, message = PASSWORD_WRONG_EXCEPTION)
         private String password;
+
         @NotEmpty(message = EMAIL_EMPTY_EXCEPTION)
         @Email(message = EMAIL_WRONG_EXCEPTION)
         private String email;
@@ -45,9 +48,11 @@ public class MemberRequest {
         @NotEmpty(message = USERNAME_EMPTY_EXCEPTION)
         @Pattern(regexp = USERNAME_PATTERN, message = USERNAME_WRONG_EXCEPTION)
         private String username;
+
         @NotEmpty(message = PASSWORD_EMPTY_EXCEPTION)
         @Pattern(regexp = PASSWORD_PATTERN, message = PASSWORD_WRONG_EXCEPTION)
         private String oldPassword;
+
         @NotEmpty(message = PASSWORD_EMPTY_EXCEPTION)
         @Pattern(regexp = PASSWORD_PATTERN, message = PASSWORD_WRONG_EXCEPTION)
         private String newPassword;
@@ -59,6 +64,7 @@ public class MemberRequest {
     public static class WithdrawDto {
         @NotEmpty(message = USERNAME_EMPTY_EXCEPTION)
         private String username;
+
         @NotEmpty(message = PASSWORD_EMPTY_EXCEPTION)
         private String password;
     }
