@@ -68,7 +68,7 @@ public class MemberRepositoryTests {
         assertThat(result).isZero();
     }
 
-    @DisplayName("회원존재 쿼리 테스트 : 아이디 (존재함)")
+    @DisplayName("회원 중복 검사 쿼리 테스트 : 아이디 (존재함)")
     @Test
     void test_existsMemberByUsername_when_exists() {
         boolean result = memberRepository.existsMemberByUsername("username");
@@ -76,7 +76,7 @@ public class MemberRepositoryTests {
         assertThat(result).isTrue();
     }
 
-    @DisplayName("회원존재 쿼리 테스트 : 아이디 (존재하지않음)")
+    @DisplayName("회원 중복 검사 쿼리 테스트 : 아이디 (존재하지 않음)")
     @Test
     void test_existsMemberByUsername_when_notExists() {
         boolean result = memberRepository.existsMemberByUsername("usernameValid");
@@ -84,7 +84,7 @@ public class MemberRepositoryTests {
         assertThat(result).isFalse();
     }
 
-    @DisplayName("회원존재 쿼리 테스트 : 이메일 (존재함)")
+    @DisplayName("회원 중복 검사 쿼리 테스트 : 이메일 (존재함)")
     @Test
     void test_existsMemberByEmail_when_exists() {
         boolean result = memberRepository.existsMemberByEmail("username@email.com");
@@ -92,10 +92,26 @@ public class MemberRepositoryTests {
         assertThat(result).isTrue();
     }
 
-    @DisplayName("회원존재 쿼리 테스트 : 이메일 (존재하지않음)")
+    @DisplayName("회원 중복 검사 쿼리 테스트 : 이메일 (존재하지 않음)")
     @Test
     void test_existsMemberByEmail_when_notExists() {
         boolean result = memberRepository.existsMemberByEmail("username1@email.com");
+
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("회원 중복 검사 쿼리 테스트 : 회원, 이메일 (존재함)")
+    @Test
+    void test_existsMemberByUsernameAndEmail_when_exists() {
+        boolean result = memberRepository.existsMemberByUsernameAndEmail("username", "username@email.com");
+
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("회원 중복 검사 쿼리 테스트 : 회원, 이메일 (존재하지 않음)")
+    @Test
+    void test_existsMemberByUsernameAndEmail_when_notExists() {
+        boolean result = memberRepository.existsMemberByUsernameAndEmail("username1", "username1@email.com");
 
         assertThat(result).isFalse();
     }

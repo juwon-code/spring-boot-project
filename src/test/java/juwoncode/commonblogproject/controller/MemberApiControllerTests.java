@@ -17,6 +17,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static juwoncode.commonblogproject.vo.HttpCode.*;
+import static juwoncode.commonblogproject.vo.ResponseMessage.*;
 
 @ImportAutoConfiguration(SecurityConfig.class)
 @WebMvcTest(MemberApiController.class)
@@ -34,14 +36,14 @@ public class MemberApiControllerTests {
     void test_callCheckUsernameService_when_success() throws Exception {
         String username = "username";
 
-        when(memberService.checkUsername(anyString())).thenReturn(true);
+        when(memberService.checkUsernameDuplicated(anyString())).thenReturn(true);
 
         mockMvc.perform(get("/api/member/register/check-username/" + username))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.message").value("사용가능한 아이디 입니다."));
+                .andExpect(jsonPath("$.code").value(HTTP_STATUS_OK))
+                .andExpect(jsonPath("$.message").value(USERNAME_NOT_DUPLICATE_MESSAGE));
 
-        verify(memberService).checkUsername(anyString());
+        verify(memberService).checkUsernameDuplicated(anyString());
     }
 
     @DisplayName("아이디 중복 검사 서비스 호출 테스트 (실패)")
@@ -50,14 +52,14 @@ public class MemberApiControllerTests {
     void test_callCheckUsernameService_when_failure() throws Exception {
         String username = "username";
 
-        when(memberService.checkUsername(anyString())).thenReturn(false);
+        when(memberService.checkUsernameDuplicated(anyString())).thenReturn(false);
 
         mockMvc.perform(get("/api/member/register/check-username/" + username))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(409))
-                .andExpect(jsonPath("$.message").value("중복된 회원 아이디 입니다."));
+                .andExpect(jsonPath("$.code").value(HTTP_STATUS_CONFLICT))
+                .andExpect(jsonPath("$.message").value(USERNAME_DUPLICATE_MESSAGE));
 
-        verify(memberService).checkUsername(anyString());
+        verify(memberService).checkUsernameDuplicated(anyString());
     }
 
     @DisplayName("이메일 중복 검사 서비스 호출 테스트 (성공)")
@@ -66,14 +68,14 @@ public class MemberApiControllerTests {
     void test_callCheckEmailService_when_success() throws Exception {
         String email = "aa@aa.aa";
 
-        when(memberService.checkEmail(anyString())).thenReturn(true);
+        when(memberService.checkEmailDuplicated(anyString())).thenReturn(true);
 
         mockMvc.perform(get("/api/member/register/check-email/" + email))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.message").value("사용가능한 이메일 입니다."));
+                .andExpect(jsonPath("$.code").value(HTTP_STATUS_OK))
+                .andExpect(jsonPath("$.message").value(EMAIL_NOT_DUPLICATE_MESSAGE));
 
-        verify(memberService).checkEmail(anyString());
+        verify(memberService).checkEmailDuplicated(anyString());
     }
 
     @DisplayName("이메일 중복 검사 서비스 호출 테스트 (실패)")
@@ -82,13 +84,13 @@ public class MemberApiControllerTests {
     void test_callCheckEmailService_when_failure() throws Exception {
         String email = "aa@aa.aa";
 
-        when(memberService.checkEmail(anyString())).thenReturn(false);
+        when(memberService.checkEmailDuplicated(anyString())).thenReturn(false);
 
         mockMvc.perform(get("/api/member/register/check-email/" + email))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(409))
-                .andExpect(jsonPath("$.message").value("중복된 이메일 입니다."));
+                .andExpect(jsonPath("$.code").value(HTTP_STATUS_CONFLICT))
+                .andExpect(jsonPath("$.message").value(EMAIL_DUPLICATE_MESSAGE));
 
-        verify(memberService).checkEmail(anyString());
+        verify(memberService).checkEmailDuplicated(anyString());
     }
 }

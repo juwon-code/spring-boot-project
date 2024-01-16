@@ -21,6 +21,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static juwoncode.commonblogproject.vo.ResponseMessage.*;
 
 @ImportAutoConfiguration(SecurityConfig.class)
 @WebMvcTest(MemberViewController.class)
@@ -47,7 +48,7 @@ public class MemberViewControllerTests {
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/member/validate/email"))
-                .andExpect(flash().attribute("message", "회원가입이 성공했습니다!"));
+                .andExpect(flash().attribute("message", REGISTER_SUCCESS_MESSAGE));
 
         verify(memberService).register(any(MemberRequest.RegisterDto.class));
     }
@@ -65,7 +66,7 @@ public class MemberViewControllerTests {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/member/register"))
-                .andExpect(flash().attribute("message", "회원가입이 실패했습니다!"));
+                .andExpect(flash().attribute("message", REGISTER_FAILURE_MESSAGE));
 
         verify(memberService).register(any(MemberRequest.RegisterDto.class));
     }
@@ -82,8 +83,8 @@ public class MemberViewControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/member/login"))
-                .andExpect(flash().attribute("message", "비밀번호 변경이 성공했습니다! 다시 로그인해주세요."));
+                .andExpect(redirectedUrl("/member/logout"))
+                .andExpect(flash().attribute("message", CHANGE_PASSWORD_SUCCESS_MESSAGE));
 
         verify(memberService).changePassword(any(MemberRequest.ChangePasswordDto.class));
     }
@@ -101,7 +102,7 @@ public class MemberViewControllerTests {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/member/change/password"))
-                .andExpect(flash().attribute("message", "비밀번호 변경이 실패했습니다!"));
+                .andExpect(flash().attribute("message", CHANGE_PASSWORD_FAILURE_MESSAGE));
 
         verify(memberService).changePassword(any(MemberRequest.ChangePasswordDto.class));
     }

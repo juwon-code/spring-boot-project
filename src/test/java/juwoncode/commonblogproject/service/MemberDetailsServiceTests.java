@@ -50,8 +50,7 @@ public class MemberDetailsServiceTests {
     public void test_loadUserByUsername_when_failure() {
         when(memberRepository.findMemberByUsername(anyString())).thenThrow(UsernameNotFoundException.class);
 
-        assertThatThrownBy(() -> {
-            memberDetailsService.loadUserByUsername(anyString());
-        }).isInstanceOf(UsernameNotFoundException.class);
+        assertThatThrownBy(() -> memberDetailsService.loadUserByUsername(anyString()))
+                .isInstanceOf(UsernameNotFoundException.class);
     }
 }
