@@ -9,6 +9,8 @@ public interface MemberService {
 
     boolean changePassword(MemberRequest.ChangePasswordDto dto);
 
+    boolean checkPasswordMatched(String rawPassword, String encodedPassword);
+
     boolean checkUsernameDuplicated(String username);
 
     boolean checkEmailDuplicated(String email);

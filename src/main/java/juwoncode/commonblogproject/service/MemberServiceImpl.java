@@ -2,6 +2,7 @@ package juwoncode.commonblogproject.service;
 
 import jakarta.transaction.Transactional;
 import juwoncode.commonblogproject.domain.Member;
+import juwoncode.commonblogproject.exception.NoSuchDataException;
 import juwoncode.commonblogproject.repository.MemberRepository;
 import juwoncode.commonblogproject.dto.MemberRequest;
 import juwoncode.commonblogproject.vo.Role;
@@ -10,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 import static juwoncode.commonblogproject.vo.LoggerMessage.*;
@@ -67,7 +67,7 @@ public class MemberServiceImpl implements MemberService {
 
         try {
             Member member = memberRepository.findMemberByUsername(username)
-                    .orElseThrow(() -> new NoSuchElementException(CHANGE_PASSWORD_SERVICE_EMPTY_LOG));
+                    .orElseThrow(() -> new NoSuchDataException(CHANGE_PASSWORD_SERVICE_EMPTY_LOG));
             String correctPassword = member.getPassword();
 
             if (!checkPasswordMatched(oldPassword, correctPassword)) {
@@ -78,7 +78,7 @@ public class MemberServiceImpl implements MemberService {
             memberRepository.save(member);
             logger.info(CHANGE_PASSWORD_SERVICE_SUCCESS_LOG, username);
             return true;
-        } catch (NoSuchElementException | IllegalArgumentException e) {
+        } catch (NoSuchDataException | IllegalArgumentException e) {
             logger.info(e.getMessage(), username);
             return false;
         }
@@ -96,7 +96,7 @@ public class MemberServiceImpl implements MemberService {
 
         try {
             Member member = memberRepository.findMemberByUsername(username)
-                    .orElseThrow(() -> new NoSuchElementException(WITHDRAW_SERVICE_EMPTY_LOG));
+                    .orElseThrow(() -> new NoSuchDataException(WITHDRAW_SERVICE_EMPTY_LOG));
             String correctPassword = member.getPassword();
 
             if (!checkPasswordMatched(password, correctPassword)) {
@@ -106,13 +106,14 @@ public class MemberServiceImpl implements MemberService {
             memberRepository.deleteMemberByUsernameAndPassword(username, password);
             logger.info(WITHDRAW_SERVICE_SUCCESS_LOG, username);
             return true;
-        } catch (NoSuchElementException | IllegalArgumentException e) {
+        } catch (NoSuchDataException | IllegalArgumentException e) {
             logger.info(e.getMessage(), username);
             return false;
         }
     }
 
-    private boolean checkPasswordMatched(String rawPassword, String encodedPassword) {
+    @Override
+    public boolean checkPasswordMatched(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 

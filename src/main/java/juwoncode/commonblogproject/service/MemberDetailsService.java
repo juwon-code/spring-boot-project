@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import static juwoncode.commonblogproject.vo.ExceptionMessage.*;
 import static juwoncode.commonblogproject.vo.LoggerMessage.*;
 
 @Service
@@ -26,7 +25,7 @@ public class MemberDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) {
         try {
             Member member = memberRepository.findMemberByUsername(username)
-                    .orElseThrow(() -> new UsernameNotFoundException(FIND_MEMBER_WITH_USERNAME_FAILURE_LOG));
+                    .orElseThrow(() -> new UsernameNotFoundException(FIND_MEMBER_WITH_USERNAME_FAILURE_LOG + username));
 
             logger.info(FIND_MEMBER_WITH_USERNAME_SUCCESS_LOG + username);
             return MemberDetails.builder()
@@ -37,7 +36,7 @@ public class MemberDetailsService implements UserDetailsService {
                     .enabled(member.isEnabled())
                     .build();
         } catch (UsernameNotFoundException e) {
-            logger.info(FIND_MEMBER_WITH_USERNAME_FAILURE_LOG + username);
+            logger.info(e.getMessage());
             throw e;
         }
     }
