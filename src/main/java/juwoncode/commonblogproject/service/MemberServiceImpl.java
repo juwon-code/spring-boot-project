@@ -5,7 +5,7 @@ import juwoncode.commonblogproject.domain.Member;
 import juwoncode.commonblogproject.exception.NoSuchDataException;
 import juwoncode.commonblogproject.repository.MemberRepository;
 import juwoncode.commonblogproject.dto.MemberRequest;
-import juwoncode.commonblogproject.vo.Role;
+import juwoncode.commonblogproject.vo.RoleType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,7 +42,7 @@ public class MemberServiceImpl implements MemberService {
                     .username(username)
                     .password(encryptPassword(password))
                     .email(email)
-                    .role(Role.USER)
+                    .role(RoleType.USER)
                     .build();
 
             memberRepository.save(member);
@@ -115,6 +115,18 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean checkPasswordMatched(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    @Override
+    public Member getMemberByEmail(String email) {
+        return memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new NoSuchDataException(FIND_MEMBER_WITH_EMAIL_FAILURE_LOG));
+    }
+
+    @Override
+    public void setMemberEnabled(Member member) {
+        member.setEnabled(true);
+        memberRepository.save(member);
     }
 
     @Override

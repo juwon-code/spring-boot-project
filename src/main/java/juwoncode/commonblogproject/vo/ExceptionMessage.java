@@ -16,10 +16,12 @@ public final class ExceptionMessage {
     // 이메일 예외 메시지
     public static final String EMAIL_WRONG_EXCEPTION = "이메일 파라미터 형식이 올바르지 않습니다.";
     public static final String EMAIL_EMPTY_EXCEPTION = "이메일 파라미터가 비어있습니다.";
-    
-    // 회원조회 예외 메시지
-    public static final String USERNAME_NOT_EXISTS_EXCEPTION = "일치하는 회원을 찾을 수 없습니다.";
-    
+
+    // 메일전송 예외 메시지
+    public static final String EMAIL_CODE_EMPTY_EXCEPTION = "메일 코드 파라미터가 비어있습니다.";
+    public static final String EMAIL_TYPE_EMPTY_EXCEPTION = "메일 타입 파라미터가 비어있습니다.";
+
+
     // API 응답 예외 메시지
     public static final String HTTP_CODE_EMPTY_EXCEPTION = "응답 HTTP 코드가 누락되었습니다.";
     public static final String API_MESSAGE_EMPTY_EXCEPTION = "응답 메시지가 누락되었습니다.";
