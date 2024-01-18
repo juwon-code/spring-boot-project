@@ -1,7 +1,7 @@
 package juwoncode.commonblogproject.domain;
 
 import jakarta.persistence.*;
-import juwoncode.commonblogproject.vo.Role;
+import juwoncode.commonblogproject.vo.RoleType;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -26,13 +26,13 @@ public class Member extends BaseTime {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private RoleType role;
 
     @ColumnDefault("false")
     private boolean enabled;
 
     @Builder
-    public Member(String username, String password, String email, Role role) {
+    public Member(String username, String password, String email, RoleType role) {
         this.username = username;
         this.password = password;
         this.email = email;

@@ -1,5 +1,9 @@
 package juwoncode.commonblogproject.vo;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ResponseMessage {
     // 회원명 중복 검사 응답 메시지
     public static final String USERNAME_DUPLICATE_MESSAGE = "중복된 회원명입니다.";

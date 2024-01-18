@@ -2,7 +2,7 @@ package juwoncode.commonblogproject.service;
 
 import juwoncode.commonblogproject.domain.Member;
 import juwoncode.commonblogproject.repository.MemberRepository;
-import juwoncode.commonblogproject.vo.Role;
+import juwoncode.commonblogproject.vo.RoleType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +34,7 @@ public class MemberDetailsServiceTests {
                 .username("username")
                 .password("password")
                 .email("username@email.com")
-                .role(Role.USER)
+                .role(RoleType.USER)
                 .build();
 
         when(memberRepository.findMemberByUsername(anyString())).thenReturn(Optional.of(member));

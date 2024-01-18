@@ -1,6 +1,6 @@
 package juwoncode.commonblogproject.dto;
 
-import juwoncode.commonblogproject.vo.Role;
+import juwoncode.commonblogproject.vo.RoleType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,7 +17,7 @@ public class MemberDetails implements UserDetails {
     private String username;
     private String password;
     private String email;
-    private Role role;
+    private RoleType role;
     private boolean enabled;
 
     @Override
