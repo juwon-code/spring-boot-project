@@ -1,6 +1,7 @@
 package juwoncode.commonblogproject.service;
 
 import jakarta.transaction.Transactional;
+import juwoncode.commonblogproject.config.LoggerProvider;
 import juwoncode.commonblogproject.domain.Member;
 import juwoncode.commonblogproject.exception.NoSuchDataException;
 import juwoncode.commonblogproject.repository.MemberRepository;
@@ -19,7 +20,7 @@ import static juwoncode.commonblogproject.vo.LoggerMessage.*;
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerProvider.getLogger(this.getClass());
 
     public MemberServiceImpl(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
         this.memberRepository = memberRepository;

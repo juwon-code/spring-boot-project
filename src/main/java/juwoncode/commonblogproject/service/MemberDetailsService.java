@@ -1,5 +1,6 @@
 package juwoncode.commonblogproject.service;
 
+import juwoncode.commonblogproject.config.LoggerProvider;
 import juwoncode.commonblogproject.domain.Member;
 import juwoncode.commonblogproject.dto.MemberDetails;
 import juwoncode.commonblogproject.repository.MemberRepository;
@@ -15,7 +16,7 @@ import static juwoncode.commonblogproject.vo.LoggerMessage.*;
 @Service
 public class MemberDetailsService implements UserDetailsService {
     private final MemberRepository memberRepository;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerProvider.getLogger(this.getClass());
 
     public MemberDetailsService(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
