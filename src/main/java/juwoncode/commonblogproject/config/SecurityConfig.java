@@ -1,5 +1,6 @@
 package juwoncode.commonblogproject.config;
 
+import juwoncode.commonblogproject.exception.AuthExceptionHandler;
 import juwoncode.commonblogproject.service.MemberDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +19,7 @@ public class SecurityConfig {
 
     private final static String[] SINGED_LINKS = {"/member/change/**"};
 
-    private final static String[] ANONYMOUS_LINKS = {"/api/member/register/**", "/member/login", "/member/register"};
+    private final static String[] ANONYMOUS_LINKS = {"/api/member/register/**", "/member/login**", "/member/register"};
 
     private final static String[] PUBLIC_LINKS = {"/home", "/email/verify/**"};
 
@@ -26,8 +27,11 @@ public class SecurityConfig {
 
     private final MemberDetailsService memberDetailsService;
 
-    public SecurityConfig(MemberDetailsService memberDetailsService) {
+    private final AuthExceptionHandler authExceptionHandler;
+
+    public SecurityConfig(MemberDetailsService memberDetailsService, AuthExceptionHandler authExceptionHandler) {
         this.memberDetailsService = memberDetailsService;
+        this.authExceptionHandler = authExceptionHandler;
     }
 
     /**
@@ -81,7 +85,7 @@ public class SecurityConfig {
         /*
             3. 로그인 폼 설정
             로그인이 성공할 경우, 홈 페이지로 이동한다.
-            로그인이 실패할 경우, 로그인 페이지로 이동하며, (미구현) 실패를 사용자에게 알린다.
+            로그인이 실패할 경우, 로그인 페이지로 이동하며, 실패를 사용자에게 알린다.
          */
         httpSecurity
                 .formLogin((login) -> login
@@ -89,7 +93,7 @@ public class SecurityConfig {
                         .successHandler((request, response, authentication) -> {
                             response.sendRedirect("/home");
                         })
-                        .failureUrl("/member/login")
+                        .failureHandler(authExceptionHandler)
                         .permitAll());
 
         /*
