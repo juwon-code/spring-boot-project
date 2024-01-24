@@ -42,6 +42,18 @@ public class EmailServiceTests {
     @InjectMocks
     EmailServiceImpl emailService;
 
+    /**
+     * 인증메일 전송 서비스 메소드의 성공 케이스를 테스트한다.<br>
+     * 가짜 회원, 메일, 주소를 파라미터로 메소드가 흐름대로 작동하는지 확인한다.
+     * @see
+     *      MemberService#getMemberByEmail(String)
+     * @see
+     *      EmailRepository#findEmailByMember_EmailAndTypeAndExpired(String, EmailType, boolean)
+     * @see
+     *      EmailRepository#save(Object)
+     * @see
+     *      DynamicHostProvider#getHost()
+     */
     @DisplayName("메일 전송 서비스 테스트 (성공)")
     @Test
     void test_sendVerifyMail_when_success() {
@@ -64,6 +76,12 @@ public class EmailServiceTests {
         emailService.sendVerifyMail(dto);
     }
 
+    /**
+     * 인증메일 전송 서비스 메소드의 실패 케이스를 테스트한다.<br>
+     * 회원 메일 주소, 메일 타입과 일차하는 인증 메일이 없을 경우, {@link NoSuchDataException} 예외가 발생한다.
+     * @see
+     *      MemberService#getMemberByEmail(String)
+     */
     @DisplayName("메일 전송 서비스 테스트 (실패, 회원 존재하지 않음)")
     @Test
     void test_sendVerifyMail_when_failure() {
@@ -72,16 +90,22 @@ public class EmailServiceTests {
                 .type("REGISTER")
                 .build();
 
-        Member mockMember = mock(Member.class);
-        Email mockEmail = mock(Email.class);
-        String fakeHost = "http://localhost:8080/";
-
         when(memberService.getMemberByEmail(anyString())).thenThrow(NoSuchDataException.class);
 
         assertThatThrownBy(() -> emailService.sendVerifyMail(dto))
                 .isInstanceOf(NoSuchDataException.class);
     }
 
+    /**
+     * 인증메일 확인 서비스 메소드의 성공 케이스를 테스트한다.<br>
+     * 메일 코드, 타입과 일치하는 인증메일이 만료되지 않았을 경우, true를 반환한다.
+     * @see
+     *      EmailRepository#findEmailByCodeAndType(String, EmailType)
+     * @see
+     *      EmailRepository#save(Object) 
+     * @see
+     *      MemberService#setMemberEnabled(Member)
+     */
     @DisplayName("메일 확인 서비스 테스트 (성공)")
     @Test
     void test_checkVerifyMail_when_success() {
@@ -111,6 +135,12 @@ public class EmailServiceTests {
         assertThat(result).isTrue();
     }
 
+    /**
+     * 인증메일 확인 서비스 메소드의 실패 케이스를 테스트한다.<br>
+     * 메일 코드, 타입과 일치하는 인증 메일이 존재하지 않을 때, false를 반환한다.
+     * @see
+     *      EmailRepository#findEmailByCodeAndType(String, EmailType)
+     */
     @DisplayName("메일 확인 서비스 테스트 (실패, 존재하지 않는 이메일)")
     @Test
     void test_checkVerifyMail_when_notExists() {
@@ -140,6 +170,12 @@ public class EmailServiceTests {
         assertThat(result).isFalse();
     }
 
+    /**
+     * 인증메일 확인 서비스 메소드의 실패 케이스를 테스트한다.<br>
+     * 메일 코드, 타입과 일치하는 인증 메일이 만료된 상태일 경우, false를 반환한다.
+     * @see
+     *      EmailRepository#findEmailByCodeAndType(String, EmailType)
+     */
     @DisplayName("메일 확인 서비스 테스트 (실패, 이미 만료됨)")
     @Test
     void test_checkVerifyMail_when_alreadyExpired() {

@@ -24,6 +24,9 @@ public class EmailRepositoryTests {
     @Autowired
     EmailRepository emailRepository;
 
+    /**
+     * 각 테스트를 수행하기 전에 임시 회원 및 메일을 저장한다.
+     */
     @BeforeEach
     void setup() {
         Member member = Member.builder()
@@ -42,6 +45,9 @@ public class EmailRepositoryTests {
         emailRepository.save(email);
     }
 
+    /**
+     * 회원 메일주소, 메일 타입으로 인증메일을 조회하는 메소드의 성공 케이스를 테스트한다.
+     */
     @DisplayName("인증메일조회 쿼리 테스트 : 이메일, 타입, 만료여부 (성공)")
     @Test
     void test_findEmailByMember_EmailAndTypeAndExpired_when_success() {
@@ -54,6 +60,9 @@ public class EmailRepositoryTests {
         assertThat(result.getMember()).isNotNull();
     }
 
+    /**
+     * 회원 메일주소, 메일 타입으로 인증메일을 조회하는 메소드의 실패 케이스를 테스트한다.
+     */
     @DisplayName("인증메일조회 쿼리 테스트 : 이메일, 타입, 만료여부 (실패)")
     @Test
     void test_findEmailByMember_EmailAndTypeAndExpired_when_failure() {
@@ -63,6 +72,9 @@ public class EmailRepositoryTests {
         }).isInstanceOf(NoSuchDataException.class);
     }
 
+    /**
+     * 메일 코드, 메일 타입으로 인증메일을 조회하는 메소드의 성공 케이스를 테스트한다.
+     */
     @DisplayName("인증메일조회 쿼리 테스트 : 코드, 타입 (성공)")
     @Test
     void test_findEmailByCodeAndType_when_success() {
@@ -75,6 +87,9 @@ public class EmailRepositoryTests {
         assertThat(result.getMember()).isNotNull();
     }
 
+    /**
+     * 메일 코드, 메일 타입으로 인증메일을 조회하는 메소드의 실패 케이스를 테스트한다.
+     */
     @DisplayName("인증메일조회 쿼리 테스트 : 코드, 타입 (실패)")
     @Test
     void test_findEmailByCodeAndType_when_failure() {

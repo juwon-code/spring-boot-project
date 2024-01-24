@@ -20,6 +20,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.RequestBuilder;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -62,7 +63,7 @@ public class MemberViewControllerTests {
      * 시큐리티에서 설정한 폼 로그인의 성공 케이스를 테스트한다.<br>
      * 올바른 ID와 패스워드로 로그인을 시도할 때 인증이 성공한다.
      * @throws Exception
-     *      {@link MockMvc}.perform() 수행 중 발생할 수 있는 예외.
+     *      {@link MockMvc#perform(RequestBuilder)} 수행 중에 발생할 수 있는 예외.
      */
     @DisplayName("시큐리티 폼 로그인 테스트 (성공)")
     @WithAnonymousUser
@@ -92,7 +93,7 @@ public class MemberViewControllerTests {
      * 시큐리티에서 설정한 폼 로그인의 실패 케이스를 테스트한다.<br>
      * 올바른 ID와 잘못된 패스워드로 로그인을 시도할 때 인증은 실패한다.
      * @throws Exception
-     *      {@link MockMvc}.perform() 수행 중 발생할 수 있는 예외.
+     *      {@link MockMvc#perform(RequestBuilder)} 수행 중에 발생할 수 있는 예외.
      */
     @DisplayName("시큐리티 폼 로그인 테스트 (실패)")
     @WithAnonymousUser
@@ -119,7 +120,7 @@ public class MemberViewControllerTests {
      * 시큐리티에서 설정한 로그아웃의 실패 케이스를 테스트한다.<br>
      * 로그인된 가짜 회원을 로그아웃할 경우 로그인 페이지로 이동한다.
      * @throws Exception
-     *      {@link MockMvc}.perform() 수행 중 발생할 수 있는 예외.
+     *      {@link MockMvc#perform(RequestBuilder)} 수행 중에 발생할 수 있는 예외.
      */
     @DisplayName("시큐리티 폼 로그아웃 테스트 (성공)")
     @WithMockUser
@@ -131,10 +132,11 @@ public class MemberViewControllerTests {
     }
 
     /**
-     * 회원가입 서비스를 호출하는 메소드의 성공 케이스를 테스트한다.<br>
-     * {@link MemberService}.register()가 true를 반환할 때, 성공 메시지와 함께 인증메일 전송 완료 페이지로 리다이렉션을 수행한다.
+     * 회원가입 서비스 호출 메소드의 성공 케이스를 테스트한다.<br>
+     * {@link MemberService#register(MemberRequest.RegisterDto)}에서 true를 반환할 때,
+     * 성공 메시지와 함께 인증메일 전송 완료 페이지로 리다이렉션을 수행한다.
      * @throws Exception
-     *      {@link MockMvc}.perform() 수행 중 발생할 수 있는 예외.
+     *      {@link MockMvc#perform(RequestBuilder)} 수행 중에 발생할 수 있는 예외.
      */
     @DisplayName("회원가입 서비스 호출 테스트 (성공)")
     @WithAnonymousUser
@@ -157,10 +159,11 @@ public class MemberViewControllerTests {
     }
     
     /**
-     * 회원가입 서비스를 호출하는 메소드의 실패 케이스를 테스트한다.<br>
-     * {@link MemberService}.register()가 false를 반환할 때, 실패 메시지와 함께 회원가입 페이지로 리다이렉션을 수행한다.
+     * 회원가입 서비스 호출 메소드의 실패 케이스를 테스트한다.<br>
+     * {@link MemberService#register(MemberRequest.RegisterDto)}에서 false를 반환할 때,
+     * 실패 메시지와 함께 회원가입 페이지로 리다이렉션을 수행한다.
      * @throws Exception
-     *      {@link MockMvc}.perform() 수행 중 발생할 수 있는 예외.
+     *      {@link MockMvc#perform(RequestBuilder)} 수행 중에 발생할 수 있는 예외.
      */
     @DisplayName("회원가입 서비스 호출 테스트 (실패)")
     @WithAnonymousUser
@@ -184,9 +187,10 @@ public class MemberViewControllerTests {
 
     /**
      * 비밀번호 변경 서비스를 호출하는 메소드의 성공 케이스를 테스트한다.<br>
-     * {@link MemberService}.changePassword()가 true를 반환할 때, 성공 메시지와 함께 로그아웃을 수행한다.
+     * {@link MemberService#changePassword(MemberRequest.ChangePasswordDto)}에서 true를 반환할 때,
+     * 성공 메시지와 함께 로그아웃을 수행한다.
      * @throws Exception
-     *      {@link MockMvc}.perform() 수행 중 발생할 수 있는 예외.
+     *      {@link MockMvc#perform(RequestBuilder)} 수행 중에 발생할 수 있는 예외.
      */
     @DisplayName("비밀번호 수정 서비스 호출 테스트 (성공)")
     @WithMockUser
@@ -210,9 +214,10 @@ public class MemberViewControllerTests {
 
     /**
      * 비밀번호 변경 서비스를 호출하는 메소드의 실패 케이스를 테스트한다.<br>
-     * {@link MemberService}.changePassword()가 false를 반환할 때, 실패 메시지와 함께 비밀번호 변경 페이지로 리다이렉션을 수행한다.
+     * {@link MemberService#changePassword(MemberRequest.ChangePasswordDto)}에서 false를 반환할 때,
+     * 실패 메시지와 함께 비밀번호 변경 페이지로 리다이렉션을 수행한다.
      * @throws Exception
-     *      {@link MockMvc}.perform() 수행 중 발생할 수 있는 예외.
+     *      {@link MockMvc#perform(RequestBuilder)} 수행 중에 발생할 수 있는 예외.
      */
     @DisplayName("비밀번호 수정 서비스 호출 테스트 (실패)")
     @WithMockUser
