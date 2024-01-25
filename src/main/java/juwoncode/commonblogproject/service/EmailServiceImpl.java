@@ -33,6 +33,7 @@ public class EmailServiceImpl implements EmailService {
         this.dynamicHostProvider = dynamicHostProvider;
     }
 
+
     @Override
     public void sendVerifyMail(SendDto dto) {
         String email = dto.getEmail();
@@ -47,6 +48,18 @@ public class EmailServiceImpl implements EmailService {
         sendMail(email, code, type);
     }
 
+    /**
+     * 생성한 인증 메일을 메일주소로 전송한다.<br>
+     * {@link SimpleMailMessage} 타입의 메일을 {@link JavaMailSender} 객체를 사용하여 전송한다.
+     * @param email
+     *      수신 메일 주소
+     * @param code
+     *      인증 메일 코드
+     * @param type
+     *      인증 메일 타입
+     * @see 
+     *      JavaMailSender#send(SimpleMailMessage)
+     */
     private void sendMail(String email, String code, EmailType type) {
         SimpleMailMessage message = makeVerificationMail(email, code, type);
         javaMailSender.send(message);
@@ -74,6 +87,19 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    /**
+     * 회원 메일 주소와 일치하는 이전 인증 메일을 만료한다.<br>
+     * 회원 메일 주소, 인증 메일 타입과 일치하는 만료되지 않은 메일을 조회하고,
+     * 결과가 존재할 경우 만료하고 저장한다.
+     * @param email
+     *      회원 메일 주소
+     * @param type
+     *      인증 메일 타입
+     * @see
+     *      EmailRepository#findEmailByMember_EmailAndTypeAndExpired(String, EmailType, boolean)
+     * @see
+     *      EmailRepository#save(Object)
+     */
     private void expirePreviousMail(String email, EmailType type) {
         try {
             Email data = emailRepository.findEmailByMember_EmailAndTypeAndExpired(email, type, false)
@@ -86,6 +112,17 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    /**
+     * 인증 메일을 데이터베이스에 저장한다.
+     * @param code
+     *      인증 메일 코드.
+     * @param type
+     *      인증 메일 타입.
+     * @param member
+     *      회원 엔티티 객체.
+     * @see
+     *      EmailRepository#save(Object)
+     */
     private void saveMailDB(String code, EmailType type, Member member) {
         Email email = Email.builder()
                 .code(code)
@@ -96,6 +133,18 @@ public class EmailServiceImpl implements EmailService {
         emailRepository.save(email);
     }
 
+    /**
+     * 새로운 인증 메일을 생성하고 반환한다.<br>
+     * {@link SimpleMailMessage} 인스턴스를 생성하고 제목, 내용, 수신 주소, 송신 주소를 설정하고 반환한다.
+     * @param email
+     *      회원 메일 주소.
+     * @param code
+     *      인증 메일 코드.
+     * @param type
+     *      인증 메일 타입.
+     * @return
+     *      설정이 끝난 인증 메일 인스턴스.
+     */
     private SimpleMailMessage makeVerificationMail(String email, String code, EmailType type) {
         SimpleMailMessage message = new SimpleMailMessage();
 
@@ -107,10 +156,27 @@ public class EmailServiceImpl implements EmailService {
         return message;
     }
 
+    /**
+     * 인증 메일 내용을 생성하고 반환한다.<br>
+     * 인증 메일 내용에 인증 확인 링크를 첨부하여 반환한다.
+     * @param code
+     *      인증 메일 코드.
+     * @param type
+     *      인증 메일 타입.
+     * @return
+     *      인증 메일 내용.
+     * @see
+     *      DynamicHostProvider#getHost()
+     */
     private String makeMailText(String code, String type) {
         return String.format(VERIFICATION_MAIL_TEXT, dynamicHostProvider.getHost(), code, type);
     }
 
+    /**
+     * 64 자리의 인증 메일 코드를 생성하고 반환한다.
+     * @return
+     *      인증 메일 코드.
+     */
     private String generateRandomCode() {
         return RandomStringUtils.randomAlphanumeric(64);
     }

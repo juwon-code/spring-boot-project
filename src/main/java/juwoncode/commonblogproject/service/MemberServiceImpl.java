@@ -55,6 +55,15 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
+    /**
+     * 회원명, 비밀번호와 일치하는 회원이 존재하는지 조회하고 결과를 반환한다.
+     * @param username
+     *      회원명.
+     * @param password
+     *      비밀번호.
+     * @return
+     *      조회 결과.
+     */
     private boolean checkMemberRegistered(String username, String password) {
         return memberRepository.existsMemberByUsernameAndEmail(username, password);
     }
@@ -85,6 +94,15 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
+    /**
+     * 암호화되지 않은 비밀번호를 암호화한다.
+     * @param rawPassword
+     *      암호화되지 않은 비밀번호.
+     * @return
+     *      암호화된 비밀번호.
+     * @see 
+     *      PasswordEncoder#encode(CharSequence)
+     */
     private String encryptPassword(String rawPassword) {
         return passwordEncoder.encode(rawPassword);
     }

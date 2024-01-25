@@ -5,7 +5,6 @@ import juwoncode.commonblogproject.domain.Member;
 import juwoncode.commonblogproject.dto.MemberDetails;
 import juwoncode.commonblogproject.repository.MemberRepository;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,6 +21,16 @@ public class MemberDetailsService implements UserDetailsService {
         this.memberRepository = memberRepository;
     }
 
+    /**
+     * 회원명과 일치하는 회원을 조회한다.
+     * 회원명과 일치하는 {@link Member} 객체를 조회하고, 존재할 경우 {@link MemberDetails} 객체로 변환하여 반환한다.
+     * @param username 
+     *      회원명.
+     * @return
+     *      조회한 회원 객체.
+     * @exception UsernameNotFoundException
+     *      회원이 존재하지 않을 경우 발생하는 예외.
+     */
     @Override
     public UserDetails loadUserByUsername(String username) {
         try {
