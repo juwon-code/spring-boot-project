@@ -11,6 +11,17 @@ import static juwoncode.commonblogproject.vo.ExceptionMessage.*;
 
 @Valid
 public class EmailRequest {
+    /**
+     * 인증 메일 전송 요청 파라미터를 담고있는 DTO 클래스.<br>
+     * <pre>
+     * - email: 인증 메일 주소, 비워둘 수 없음, 이메일 패턴 적용.
+     * - type: 인증 메일 타입, 비워둘 수 없음.
+     * </pre>
+     * @see
+     *      NotEmpty
+     * @see
+     *      Email
+     */
     @Getter
     @Builder
     @AllArgsConstructor
@@ -23,6 +34,15 @@ public class EmailRequest {
         private String type;
     }
 
+    /**
+     * 인증 메일 확인 요청 파라미터를 담고있는 DTO 클래스.<br>
+     * <pre>
+     * - code: 인증 메일 코드, 비워둘 수 없음.
+     * - type: 인증 메일 타입, 비워둘 수 없음.
+     * </pre>
+     * @see
+     *      NotEmpty
+     */
     @Getter
     @Builder
     @AllArgsConstructor

@@ -9,7 +9,16 @@ import lombok.Setter;
 import static juwoncode.commonblogproject.vo.ExceptionMessage.*;
 
 @Valid
-public class ApiResponse<T> {
+public class ApiResponse {
+    /**
+     * API 응답 파라미터로 메시지만을 담고있는 DTO 클래스.
+     * <pre>
+     * - code: HTTP 코드, 비워둘 수 없음.
+     * - message: 응답 메시지, 비워둘 수 없음.
+     * </pre>
+     * @see
+     *      NotEmpty
+     */
     @Getter
     @Setter
     @AllArgsConstructor
@@ -21,6 +30,18 @@ public class ApiResponse<T> {
         private String message;
     }
 
+    /**
+     * API 응답 파라미터로 바디를 포함하는 DTO 클래스.
+     * @param <T>
+     *     제네릭 클래스.
+     * <pre>
+     * - code: HTTP 코드, 비워둘 수 없음.
+     * - message: 응답 메시지, 비워둘 수 없음.
+     * - body: 응답 바디, 비워둘 수 없음.
+     * </pre>
+     * @see
+     *      NotEmpty
+     */
     @Getter
     @Setter
     @AllArgsConstructor
