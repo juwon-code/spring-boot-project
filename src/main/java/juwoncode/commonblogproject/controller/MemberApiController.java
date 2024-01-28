@@ -16,6 +16,13 @@ public class MemberApiController {
         this.memberService = memberService;
     }
 
+    /**
+     * 회원명 중복 확인 서비스를 호출한다.
+     * @param username
+     *      회원명.
+     * @return
+     *      중복되지 않을 경우 상태 코드 200과 성공 메시지를 담고, 중복될 경우 상태 코드 409와 실패 메시지를 반환한다.
+     */
     @GetMapping("/register/check-username/{username}")
     public ApiResponse.OnlyMessageDto callCheckUsernameService(@PathVariable String username) {
         if (!memberService.checkUsernameDuplicated(username)) {
@@ -25,6 +32,13 @@ public class MemberApiController {
         return new ApiResponse.OnlyMessageDto(HTTP_STATUS_OK, USERNAME_NOT_DUPLICATE_MESSAGE);
     }
 
+    /**
+     * 이메일 중복 확인 서비스를 호출한다.
+     * @param email
+     *      이메일.
+     * @return
+     *      중복되지 않을 경우 상태 코드 200과 성공 메시지를 담고, 중복될 경우 상태 코드 409와 실패 메시지를 반환한다.
+     */
     @GetMapping("/register/check-email/{email}")
     public ApiResponse.OnlyMessageDto callCheckEmailService(@PathVariable String email) {
         if (!memberService.checkEmailDuplicated(email)) {
