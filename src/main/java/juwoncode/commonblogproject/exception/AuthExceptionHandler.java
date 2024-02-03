@@ -10,6 +10,8 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Component
 public class AuthExceptionHandler extends SimpleUrlAuthenticationFailureHandler {
@@ -39,7 +41,7 @@ public class AuthExceptionHandler extends SimpleUrlAuthenticationFailureHandler 
             error = "알 수 없는 문제로 로그인에 실패했습니다. 관리자에게 문의하세요.";
         }
 
-        setDefaultFailureUrl("/member/login?error=" + error);
+        setDefaultFailureUrl("/member/login?message=" + URLEncoder.encode(error, StandardCharsets.UTF_8));
         super.onAuthenticationFailure(request, response, exception);
     }
 }

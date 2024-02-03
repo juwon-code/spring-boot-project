@@ -16,7 +16,11 @@ public final class ResponseMessage {
     // 회원가입 결과 응답 메시지
     public static final String REGISTER_SUCCESS_MESSAGE = "회원가입에 성공했습니다.";
     public static final String REGISTER_FAILURE_MESSAGE = "회원가입에 실패했습니다.";
-    
+
+    // 메일 인증 결과 응답 메시지
+    public static final String REGISTER_VERIFY_SUCCESS_MESSAGE = "메일 인증에 성공했습니다.";
+    public static final String REGISTER_VERIFY_FAILURE_MESSAGE = "메일 인증에 실패했습니다.";
+
     // 비밀번호 변경 결과 응답 메시지
     public static final String CHANGE_PASSWORD_SUCCESS_MESSAGE = "비밀번호 변경에 성공했습니다. 다시 로그인하세요.";
     public static final String CHANGE_PASSWORD_FAILURE_MESSAGE = "비밀번호 변경에 실패했습니다.";

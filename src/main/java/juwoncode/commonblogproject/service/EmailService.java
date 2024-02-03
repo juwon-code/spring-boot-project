@@ -1,5 +1,7 @@
 package juwoncode.commonblogproject.service;
 
+import juwoncode.commonblogproject.domain.Member;
+
 import static juwoncode.commonblogproject.dto.EmailRequest.*;
 
 public interface EmailService {
@@ -12,12 +14,12 @@ public interface EmailService {
     void sendVerifyMail(SendDto dto);
 
     /**
-     * 인증 메일을 확인하고 결과를 반환한다.<br>
-     * 코드, 타입과 일치하는 인증 메일을 조회하고, 만료하고 결과를 반환한다.
+     * 인증 메일을 만료하고 회원 객체를 반환한다.<br>
+     * 코드, 타입과 일치하는 인증 메일을 조회하고 만료한 뒤 회원 객체를 반환한다.
      * @param dto
-     *      {@link CheckDto} 객체.
+     *      {@link ExpirationDto} 객체.
      * @return
      *      메일 인증 결과.
      */
-    boolean checkVerifyMail(CheckDto dto);
+    Member expireVerifyMail(ExpirationDto dto);
 }

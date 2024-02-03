@@ -1,7 +1,10 @@
 package juwoncode.commonblogproject.service;
 
 import juwoncode.commonblogproject.domain.Member;
+import juwoncode.commonblogproject.dto.EmailRequest;
 import juwoncode.commonblogproject.dto.MemberRequest;
+
+import static juwoncode.commonblogproject.dto.EmailRequest.*;
 
 public interface MemberService {
     /**
@@ -61,10 +64,10 @@ public interface MemberService {
     /**
      * 회원을 활성화한다.
      * 회원 객체를 파라미터로 활성화하고 데이터베이스에 저장한다.
-     * @param member
-     *      활성화할 회원.
+     * @param dto
+     *      {@link ExpirationDto} 객체.
      */
-    void setMemberEnabled(Member member);
+    boolean setMemberEnabled(EmailRequest.ExpirationDto dto);
 
     /**
      * 회원명의 중복 여부를 반환한다.<br>

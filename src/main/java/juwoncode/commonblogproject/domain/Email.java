@@ -16,7 +16,7 @@ public class Email extends BaseTime {
     @Setter(AccessLevel.NONE)
     private Long id;
 
-    @Column(length = 20, nullable = false)
+    @Column(length = 64, nullable = false)
     String code;
 
     @Enumerated(EnumType.STRING)

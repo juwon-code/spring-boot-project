@@ -3,6 +3,8 @@ package juwoncode.commonblogproject.dto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import juwoncode.commonblogproject.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,6 +34,9 @@ public class EmailRequest {
 
         @NotEmpty(message = EMAIL_TYPE_EMPTY_EXCEPTION)
         private String type;
+
+        @NotNull(message = MEMBER_NULL_EXCEPTION)
+        private Member member;
     }
 
     /**
@@ -47,6 +52,17 @@ public class EmailRequest {
     @Builder
     @AllArgsConstructor
     public static class CheckDto {
+        @NotEmpty(message = EMAIL_CODE_EMPTY_EXCEPTION)
+        private String code;
+
+        @NotEmpty(message = EMAIL_TYPE_EMPTY_EXCEPTION)
+        private String type;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class ExpirationDto {
         @NotEmpty(message = EMAIL_CODE_EMPTY_EXCEPTION)
         private String code;
 

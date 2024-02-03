@@ -3,12 +3,12 @@ package juwoncode.commonblogproject.service;
 import jakarta.transaction.Transactional;
 import juwoncode.commonblogproject.config.LoggerProvider;
 import juwoncode.commonblogproject.domain.Member;
+import juwoncode.commonblogproject.dto.EmailRequest;
 import juwoncode.commonblogproject.exception.NoSuchDataException;
 import juwoncode.commonblogproject.repository.MemberRepository;
 import juwoncode.commonblogproject.dto.MemberRequest;
 import juwoncode.commonblogproject.vo.RoleType;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +20,13 @@ import static juwoncode.commonblogproject.vo.LoggerMessage.*;
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
     private final Logger logger = LoggerProvider.getLogger(this.getClass());
 
-    public MemberServiceImpl(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
+    public MemberServiceImpl(MemberRepository memberRepository, PasswordEncoder passwordEncoder, EmailService emailService) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     @Override
@@ -46,7 +48,9 @@ public class MemberServiceImpl implements MemberService {
                     .role(RoleType.USER)
                     .build();
 
-            memberRepository.save(member);
+            Member result = memberRepository.save(member);
+            emailService.sendVerifyMail(new EmailRequest.SendDto(email, "REGISTER", result));
+
             logger.info(REGISTER_SERVICE_SUCCESS_LOG, username);
             return true;
         } catch (IllegalArgumentException e) {
@@ -143,9 +147,15 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void setMemberEnabled(Member member) {
-        member.setEnabled(true);
-        memberRepository.save(member);
+    public boolean setMemberEnabled(EmailRequest.ExpirationDto dto) {
+        try {
+            Member member = emailService.expireVerifyMail(dto);
+            member.setEnabled(true);
+            memberRepository.save(member);
+            return true;
+        } catch (NoSuchDataException | IllegalArgumentException e) {
+            return false;
+        }
     }
 
     @Override

@@ -1,5 +1,7 @@
 package juwoncode.commonblogproject.service;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import juwoncode.commonblogproject.config.DynamicHostProvider;
 import juwoncode.commonblogproject.config.LoggerProvider;
 import juwoncode.commonblogproject.domain.Email;
@@ -11,7 +13,12 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import static juwoncode.commonblogproject.dto.EmailRequest.*;
 import static juwoncode.commonblogproject.vo.LoggerMessage.*;
@@ -19,17 +26,14 @@ import static juwoncode.commonblogproject.vo.MailConstants.*;
 
 @Service
 public class EmailServiceImpl implements EmailService {
-    private final MemberService memberService;
     private final EmailRepository emailRepository;
     private final JavaMailSender javaMailSender;
     private final DynamicHostProvider dynamicHostProvider;
     private final Logger logger = LoggerProvider.getLogger(this.getClass());
 
-    public EmailServiceImpl(EmailRepository emailRepository, JavaMailSender javaMailSender, MemberService memberService
-            , DynamicHostProvider dynamicHostProvider) {
+    public EmailServiceImpl(EmailRepository emailRepository, JavaMailSender javaMailSender, DynamicHostProvider dynamicHostProvider) {
         this.emailRepository = emailRepository;
         this.javaMailSender = javaMailSender;
-        this.memberService = memberService;
         this.dynamicHostProvider = dynamicHostProvider;
     }
 
@@ -39,7 +43,7 @@ public class EmailServiceImpl implements EmailService {
         String email = dto.getEmail();
         EmailType type = EmailType.valueOf(dto.getType());
         String code = generateRandomCode();
-        Member member = memberService.getMemberByEmail(email);
+        Member member = dto.getMember();
 
         expirePreviousMail(email, type);
 
@@ -49,8 +53,8 @@ public class EmailServiceImpl implements EmailService {
     }
 
     /**
-     * 생성한 인증 메일을 메일주소로 전송한다.<br>
-     * {@link SimpleMailMessage} 타입의 메일을 {@link JavaMailSender} 객체를 사용하여 전송한다.
+     * 인증 메일을 생성하고 메일 주소로 전송한다.<br>
+     * {@link MimeMessage} 타입의 메일을 {@link JavaMailSender} 객체를 사용하여 전송한다.
      * @param email
      *      수신 메일 주소
      * @param code
@@ -61,29 +65,44 @@ public class EmailServiceImpl implements EmailService {
      *      JavaMailSender#send(SimpleMailMessage)
      */
     private void sendMail(String email, String code, EmailType type) {
-        SimpleMailMessage message = makeVerificationMail(email, code, type);
-        javaMailSender.send(message);
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        try {
+            MimeMessageHelper messageHelper = new MimeMessageHelper(message, "UTF-8");
+
+            messageHelper.setFrom(VERIFICATION_MAIL_FROM);
+            messageHelper.setTo(email);
+            messageHelper.setSubject(VERIFICATION_MAIL_SUBJECT);
+            messageHelper.setText(makeMailText(code, type.getValue()), true);
+
+            logger.info(SEND_EMAIL_SUCCESS_LOG, email);
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            logger.info(SEND_EMAIL_FAILURE_LOG, email);
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public boolean checkVerifyMail(CheckDto dto) {
+    public Member expireVerifyMail(ExpirationDto dto) {
         String code = dto.getCode();
         EmailType type = EmailType.valueOf(dto.getType());
 
         try {
             Email email = emailRepository.findEmailByCodeAndType(code, type)
-                    .orElseThrow(() -> new NoSuchDataException(FIND_EMAIL_WITH_CODE_AND_TYPE_SUCCESS_LOG));
+                    .orElseThrow(() -> new NoSuchDataException(CANNOT_FOUND_VERIFY_MAIL_LOG));
+
             if (email.isExpired()) {
-                throw new IllegalArgumentException("");
+                throw new IllegalArgumentException(UPDATE_EMAIL_EXPIRED_FAILURE_LOG);
             }
-            memberService.setMemberEnabled(email.getMember());
+
             email.setExpired(true);
             emailRepository.save(email);
             logger.info(UPDATE_EMAIL_EXPIRED_SUCCESS_LOG, code, type);
-            return true;
+            return email.getMember();
         } catch (NoSuchDataException | IllegalArgumentException e) {
-            logger.info(UPDATE_EMAIL_EXPIRED_FAILURE_LOG, code, type);
-            return false;
+            logger.info(e.getMessage(), code, type);
+            throw e;
         }
     }
 
@@ -134,29 +153,6 @@ public class EmailServiceImpl implements EmailService {
     }
 
     /**
-     * 새로운 인증 메일을 생성하고 반환한다.<br>
-     * {@link SimpleMailMessage} 인스턴스를 생성하고 제목, 내용, 수신 주소, 송신 주소를 설정하고 반환한다.
-     * @param email
-     *      회원 메일 주소.
-     * @param code
-     *      인증 메일 코드.
-     * @param type
-     *      인증 메일 타입.
-     * @return
-     *      설정이 끝난 인증 메일 인스턴스.
-     */
-    private SimpleMailMessage makeVerificationMail(String email, String code, EmailType type) {
-        SimpleMailMessage message = new SimpleMailMessage();
-
-        message.setFrom(VERIFICATION_MAIL_FROM);
-        message.setTo(email);
-        message.setSubject(VERIFICATION_MAIL_SUBJECT);
-        message.setText(makeMailText(code, type.getValue()));
-
-        return message;
-    }
-
-    /**
      * 인증 메일 내용을 생성하고 반환한다.<br>
      * 인증 메일 내용에 인증 확인 링크를 첨부하여 반환한다.
      * @param code
@@ -169,7 +165,15 @@ public class EmailServiceImpl implements EmailService {
      *      DynamicHostProvider#getHost()
      */
     private String makeMailText(String code, String type) {
-        return String.format(VERIFICATION_MAIL_TEXT, dynamicHostProvider.getHost(), code, type);
+        String host = dynamicHostProvider.getHost();
+        String encodedCode = encodeUrlParam(code);
+        String encodedType = encodeUrlParam(type);
+
+        return String.format(VERIFICATION_MAIL_TEXT, host, encodedCode, encodedType);
+    }
+
+    private String encodeUrlParam(String param) {
+        return URLEncoder.encode(param, StandardCharsets.UTF_8);
     }
 
     /**

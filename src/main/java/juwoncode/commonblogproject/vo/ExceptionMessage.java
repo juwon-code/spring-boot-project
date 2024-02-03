@@ -20,7 +20,7 @@ public final class ExceptionMessage {
     // 메일전송 예외 메시지
     public static final String EMAIL_CODE_EMPTY_EXCEPTION = "메일 코드 파라미터가 비어있습니다.";
     public static final String EMAIL_TYPE_EMPTY_EXCEPTION = "메일 타입 파라미터가 비어있습니다.";
-
+    public static final String MEMBER_NULL_EXCEPTION = "회원 파라미터가 비어있습니다.";
 
     // API 응답 예외 메시지
     public static final String HTTP_CODE_EMPTY_EXCEPTION = "응답 HTTP 코드가 누락되었습니다.";

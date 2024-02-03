@@ -17,10 +17,6 @@ public class DynamicHostProvider {
      * @return 호스트 주소
      */
     public String getHost() {
-        if (request == null) {
-            return "";
-        }
-
         String scheme = request.getScheme();
         String name = request.getServerName();
         int port = request.getServerPort();

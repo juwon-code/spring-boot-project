@@ -60,20 +60,4 @@ public class EmailViewController {
 
         return "redirect:/email/verify/result";
     }
-
-    /**
-     * 인증 메일 확인 서비스를 호출한다.
-     * @param dto
-     *      인증 메일 확인 요청 데이터를 담고 있는 DTO 객체.
-     * @return
-     *      인증 메일 확인이 성공하면 성공 페이지로, 실패할 경우 에러 페이지로 리다이렉션을 수행한다.
-     */
-    @GetMapping("/verify/check")
-    public String callCheckVerifyMailService(CheckDto dto) {
-        if (!emailService.checkVerifyMail(dto)) {
-            return "redirect:/email/verify/error";
-        }
-
-        return "redirect:/email/verify/success";
-    }
 }

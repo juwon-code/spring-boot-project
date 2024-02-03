@@ -19,9 +19,9 @@ public class SecurityConfig {
 
     private final static String[] SINGED_LINKS = {"/member/change/**"};
 
-    private final static String[] ANONYMOUS_LINKS = {"/api/member/register/**", "/member/login**", "/member/register"};
+    private final static String[] ANONYMOUS_LINKS = {"/api/member/register/**", "/member/login**", "/member/register/verify", "/member/register**", "/email/verify/**"};
 
-    private final static String[] PUBLIC_LINKS = {"/home", "/email/verify/**"};
+    private final static String[] PUBLIC_LINKS = {"/", "/home"};
 
     private final static String[] STATIC_RESOURCES = {"/layout/**", "/css/**", "/js/**", "/image/**"};
 
@@ -108,6 +108,8 @@ public class SecurityConfig {
 
         return httpSecurity.build();
     }
+
+
 
     /**
      * Spring Security의 인증 공급자를 생성하고 구성한다.<br>
