@@ -6,8 +6,12 @@
     <header th:replace="~{layout/fragments :: fragment-header}">
     </header>
 
-    <div class="container">
-        인증 메일 오류를 알리는 페이지 입니다.
+    <div class="container-fluid" style="min-height: 500px; margin-top: 150px; margin-bottom: 150px;">
+        <div class="col text-center">
+            <h3 class="text-dark mb-3">Account verification succeeded</h3>
+            <p>Your account successfully activated.</p>
+            <a th:href="@{~/member/login}">Return to sign in</a>
+        </div>
     </div>
 
     <footer th:replace="~{layout/fragments :: fragment-footer}">

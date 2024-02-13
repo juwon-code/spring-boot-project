@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: fragment-head ('Common Blog Project :: Register')}">
+</head>
+<body>
+    <header th:replace="~{layout/fragments :: fragment-header}">
+    </header>
+
+    <div class="container-fluid" style="min-height: 500px; margin-top: 150px; margin-bottom: 150px;">
+        <div class="col text-center">
+            <h3 class="text-dark mb-3">Something Error occurred</h3>
+            <p>Your account already verified or verification mail has been expired.</p>
+            <p>If verification fails for unexpected reasons, try again or contact us with <b>juwoncode@gmail.com</b></p>
+            <a th:href="@{~/member/login}">Return to sign in</a></p>
+        </div>
+    </div>
+
+    <footer th:replace="~{layout/fragments :: fragment-footer}">
+    </footer>
+</body>
+</html>

@@ -24,7 +24,7 @@ public class EmailViewController {
      */
     @GetMapping("/verify/result")
     public String getResultPage() {
-        return "email/verify/result";
+        return "/verify/result";
     }
 
     /**
@@ -34,7 +34,7 @@ public class EmailViewController {
      */
     @GetMapping("/verify/success")
     public String getSuccessPage() {
-        return "email/verify/success";
+        return "/verify/success";
     }
 
     /**
@@ -44,7 +44,7 @@ public class EmailViewController {
      */
     @GetMapping("/verify/error")
     public String getErrorPage() {
-        return "email/verify/error";
+        return "/verify/error";
     }
 
     /**
