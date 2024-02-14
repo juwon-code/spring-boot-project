@@ -6,9 +6,22 @@
     <header th:replace="~{layout/fragments :: fragment-header}">
     </header>
 
-    <div>This is Login Page</div>
+    <div>로그인 완료 페이지</div>
+
+    <form id="form-logout" th:method="post" th:action="@{~/member/logout}">
+        <button id="logout-button">로그아웃</button>
+    </form>
 
     <footer th:replace="~{layout/fragments :: fragment-footer}">
     </footer>
+
+    <script>
+        const button = document.getElementById('logout-button');
+
+        button.addEventListener('click', () => {
+            const form = document.getElementById('form-logout');
+            form.submit();
+        });
+    </script>
 </body>
 </html>

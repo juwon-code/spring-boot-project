@@ -1,91 +1,184 @@
 package juwoncode.commonblogproject.service;
 
+import jakarta.transaction.Transactional;
+import juwoncode.commonblogproject.config.LoggerProvider;
 import juwoncode.commonblogproject.domain.Member;
+import juwoncode.commonblogproject.dto.EmailRequest;
+import juwoncode.commonblogproject.exception.NoSuchDataException;
 import juwoncode.commonblogproject.repository.MemberRepository;
-import juwoncode.commonblogproject.request.MemberRequest;
+import juwoncode.commonblogproject.dto.MemberRequest;
+import juwoncode.commonblogproject.vo.RoleType;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
+import java.util.function.Function;
+
+import static juwoncode.commonblogproject.vo.LoggerMessage.*;
 
 @Service
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    public MemberServiceImpl(MemberRepository memberRepository) {
+    private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private final Logger logger = LoggerProvider.getLogger(this.getClass());
+
+    public MemberServiceImpl(MemberRepository memberRepository, PasswordEncoder passwordEncoder, EmailService emailService) {
         this.memberRepository = memberRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     @Override
+    @Transactional
     public boolean register(MemberRequest.RegisterDto dto) {
-        Member member = Member.builder()
-                .username(dto.getUsername())
-                .password(dto.getPassword())
-                .email(dto.getEmail())
-                .build();
+        String username = dto.getUsername();
+        String email = dto.getEmail();
+        String password = dto.getPassword();
 
         try {
-            memberRepository.save(member);
-            logger.info("Successfully save new member: {}", dto.getUsername());
+            if (checkMemberRegistered(username, email)) {
+                throw new IllegalArgumentException(REGISTER_SERVICE_FAILURE_LOG);
+            }
+
+            Member member = Member.builder()
+                    .username(username)
+                    .password(encryptPassword(password))
+                    .email(email)
+                    .role(RoleType.USER)
+                    .build();
+
+            Member result = memberRepository.save(member);
+            emailService.sendVerifyMail(new EmailRequest.SendDto(email, "REGISTER", result));
+
+            logger.info(REGISTER_SERVICE_SUCCESS_LOG, username);
             return true;
         } catch (IllegalArgumentException e) {
-            logger.info("Cannot save Member with empty params");
+            logger.info(e.getMessage(), username);
             return false;
         }
     }
 
+    /**
+     * 회원명, 비밀번호와 일치하는 회원이 존재하는지 조회하고 결과를 반환한다.
+     * @param username
+     *      회원명.
+     * @param password
+     *      비밀번호.
+     * @return
+     *      조회 결과.
+     */
+    private boolean checkMemberRegistered(String username, String password) {
+        return memberRepository.existsMemberByUsernameAndEmail(username, password);
+    }
+
     @Override
+    @Transactional
     public boolean changePassword(MemberRequest.ChangePasswordDto dto) {
+        String username = dto.getUsername();
+        String oldPassword = dto.getOldPassword();
+        String newPassword = dto.getNewPassword();
+
         try {
-            Member member = memberRepository.findMemberByUsernameAndPassword(dto.getUsername(), dto.getOldPassword())
-                    .orElseThrow(NoSuchElementException::new);
-            member.setPassword(dto.getNewPassword());
+            Member member = memberRepository.findMemberByUsername(username)
+                    .orElseThrow(() -> new NoSuchDataException(CHANGE_PASSWORD_SERVICE_EMPTY_LOG));
+            String correctPassword = member.getPassword();
+
+            if (!checkPasswordMatched(oldPassword, correctPassword)) {
+                throw new IllegalArgumentException(CHANGE_PASSWORD_SERVICE_WRONG_LOG);
+            }
+
+            member.setPassword(encryptPassword(newPassword));
             memberRepository.save(member);
-            logger.info("Successfully change Member password");
+            logger.info(CHANGE_PASSWORD_SERVICE_SUCCESS_LOG, username);
             return true;
-        } catch (IllegalArgumentException e) {
-            logger.info("Cannot change password with invalid param");
+        } catch (NoSuchDataException | IllegalArgumentException e) {
+            logger.info(e.getMessage(), username);
             return false;
         }
     }
 
+    /**
+     * 암호화되지 않은 비밀번호를 암호화한다.
+     * @param rawPassword
+     *      암호화되지 않은 비밀번호.
+     * @return
+     *      암호화된 비밀번호.
+     * @see 
+     *      PasswordEncoder#encode(CharSequence)
+     */
+    private String encryptPassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
+    }
+
     @Override
+    @Transactional
     public boolean withdraw(MemberRequest.WithdrawDto dto) {
-        Long deletedCount = memberRepository.deleteMemberByUsernameAndPassword(dto.getUsername(), dto.getPassword());
+        String username = dto.getUsername();
+        String password = dto.getPassword();
 
-        if (deletedCount != 1) {
-            logger.info("Cannot delete Member: {}", dto.getUsername());
+        try {
+            Member member = memberRepository.findMemberByUsername(username)
+                    .orElseThrow(() -> new NoSuchDataException(WITHDRAW_SERVICE_EMPTY_LOG));
+            String correctPassword = member.getPassword();
+
+            if (!checkPasswordMatched(password, correctPassword)) {
+                throw new IllegalArgumentException(WITHDRAW_SERVICE_WRONG_LOG);
+            }
+
+            memberRepository.deleteMemberByUsernameAndPassword(username, password);
+            logger.info(WITHDRAW_SERVICE_SUCCESS_LOG, username);
+            return true;
+        } catch (NoSuchDataException | IllegalArgumentException e) {
+            logger.info(e.getMessage(), username);
             return false;
         }
-
-        logger.info("Successfully delete Member: {}", dto.getUsername());
-        return true;
     }
 
     @Override
-    public boolean checkUsername(String username) {
-        boolean result = memberRepository.existsMemberByUsername(username);
-
-        if (result) {
-            logger.info("This username already used: {}", username);
-            return false;
-        }
-
-        logger.info("This username can be used: {}", username);
-        return true;
+    public boolean checkPasswordMatched(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
     @Override
-    public boolean checkEmail(String email) {
-        boolean result = memberRepository.existsMemberByEmail(email);
+    public Member getMemberByEmail(String email) {
+        return memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new NoSuchDataException(FIND_MEMBER_WITH_EMAIL_FAILURE_LOG));
+    }
+
+    @Override
+    public boolean setMemberEnabled(EmailRequest.ExpirationDto dto) {
+        try {
+            Member member = emailService.expireVerifyMail(dto);
+            member.setEnabled(true);
+            memberRepository.save(member);
+            return true;
+        } catch (NoSuchDataException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean checkUsernameDuplicated(String username) {
+        return checkDataDuplicated(username, memberRepository::existsMemberByUsername,
+                CHECK_USERNAME_SERVICE_SUCCESS_LOG, CHECK_USERNAME_SERVICE_FAILURE_LOG);
+    }
+
+    @Override
+    public boolean checkEmailDuplicated(String email) {
+        return checkDataDuplicated(email, memberRepository::existsMemberByEmail,
+                CHECK_EMAIL_SERVICE_SUCCESS_LOG, CHECK_EMAIL_SERVICE_FAILURE_LOG);
+    }
+
+    private boolean checkDataDuplicated(String data, Function<String, Boolean> checkFunction, String successLog, String failureLog) {
+        boolean result = checkFunction.apply(data);
 
         if (result) {
-            logger.info("This email already used: {}", email);
+            logger.info(successLog, data);
             return false;
         }
 
-        logger.info("This email can be used: {}", email);
+        logger.info(failureLog, data);
         return true;
     }
 }

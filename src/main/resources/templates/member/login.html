@@ -12,7 +12,7 @@
                 <div class="mb-3 text-center">
                     <h3 class="text-dark">Login</h3>
                 </div>
-                <form action="">
+                <form id="form-login" th:method="POST" th:action="@{~/member/login}">
                     <div class="mb-2 form-floating">
                         <input type="text" class="form-control" id="username" name="username" placeholder="ID">
                         <label for="username">ID</label>
@@ -22,7 +22,7 @@
                         <label for="password">Password</label>
                     </div>
                     <div class="mb-2">
-                        <span class="text-danger" id="error"></span>
+                        <span class="text-danger" id="error" th:text="${message}"></span>
                     </div>
                     <div class="mb-2">
                         <button type="button" class="form-control btn btn-primary btn-lg" id="login-button">Login</button>
@@ -34,5 +34,43 @@
 
     <footer th:replace="~{layout/fragments :: fragment-footer}">
     </footer>
+
+    <script>
+        const button = document.getElementById('login-button');
+
+        button.addEventListener('click', () => {
+            checkParameter();
+        });
+
+        function checkParameter() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            let isValid = true;
+
+            if (!checkUsername(username) && !checkPassword(password)) {
+                updateErrorText("유저명 또는 비밀번호가 비어있습니다.");
+                isValid = false;
+            }
+
+            if (isValid === true) {
+                const form = document.getElementById('form-login');
+                form.submit();
+            }
+        }
+
+        function checkUsername(username) {
+            return username !== '';
+        }
+
+        function checkPassword(password) {
+            return password !== '';
+        }
+
+        function updateErrorText(newText) {
+            const span = document.getElementById('error');
+
+            span.innerText = newText;
+        }
+    </script>
 </body>
 </html>

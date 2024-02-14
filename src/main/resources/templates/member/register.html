@@ -107,9 +107,9 @@
             const span = document.getElementById('error-password');
 
             // 비밀번호 조건 확인 (최소 8자, 영대소문자+특수기호+숫자)
-            const regExp = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/g;
+            const regExp = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,15}$/g;
             if (!regExp.test(password)) {
-                updateErrorText(span, '비밀번호는 8자 이상의 영대소문자, 특수기호, 숫자를 포함한 문자열입니다.');
+                updateErrorText(span, '비밀번호는 8 ~ 16자의 영대소문자, 특수기호, 숫자를 포함한 문자열입니다.');
                 return false;
             }
 
