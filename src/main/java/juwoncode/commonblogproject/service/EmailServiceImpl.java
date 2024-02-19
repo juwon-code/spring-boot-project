@@ -2,8 +2,8 @@ package juwoncode.commonblogproject.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import juwoncode.commonblogproject.config.DynamicHostProvider;
-import juwoncode.commonblogproject.config.LoggerProvider;
+import juwoncode.commonblogproject.util.DynamicHostProvider;
+import juwoncode.commonblogproject.util.LoggerProvider;
 import juwoncode.commonblogproject.domain.Email;
 import juwoncode.commonblogproject.domain.Member;
 import juwoncode.commonblogproject.exception.NoSuchDataException;
@@ -16,7 +16,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 

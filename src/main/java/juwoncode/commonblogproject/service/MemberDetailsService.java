@@ -1,6 +1,6 @@
 package juwoncode.commonblogproject.service;
 
-import juwoncode.commonblogproject.config.LoggerProvider;
+import juwoncode.commonblogproject.util.LoggerProvider;
 import juwoncode.commonblogproject.domain.Member;
 import juwoncode.commonblogproject.dto.MemberDetails;
 import juwoncode.commonblogproject.repository.MemberRepository;

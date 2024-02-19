@@ -1,9 +1,8 @@
 package juwoncode.commonblogproject.service;
 
-import juwoncode.commonblogproject.config.DynamicHostProvider;
+import juwoncode.commonblogproject.util.DynamicHostProvider;
 import juwoncode.commonblogproject.domain.Email;
 import juwoncode.commonblogproject.domain.Member;
-import juwoncode.commonblogproject.dto.EmailRequest;
 import juwoncode.commonblogproject.exception.NoSuchDataException;
 import juwoncode.commonblogproject.repository.EmailRepository;
 import juwoncode.commonblogproject.vo.EmailType;

@@ -1,4 +1,4 @@
-package juwoncode.commonblogproject.config;
+package juwoncode.commonblogproject.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

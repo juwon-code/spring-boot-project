@@ -1,7 +1,7 @@
 package juwoncode.commonblogproject.service;
 
 import jakarta.transaction.Transactional;
-import juwoncode.commonblogproject.config.LoggerProvider;
+import juwoncode.commonblogproject.util.LoggerProvider;
 import juwoncode.commonblogproject.domain.Member;
 import juwoncode.commonblogproject.dto.EmailRequest;
 import juwoncode.commonblogproject.exception.NoSuchDataException;
