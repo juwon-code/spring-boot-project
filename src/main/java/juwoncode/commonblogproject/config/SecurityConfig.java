@@ -1,37 +1,51 @@
 package juwoncode.commonblogproject.config;
 
-import juwoncode.commonblogproject.exception.AuthExceptionHandler;
 import juwoncode.commonblogproject.service.MemberDetailsService;
+import juwoncode.commonblogproject.service.JwtTokenService;
+import juwoncode.commonblogproject.util.JwtTokenParser;
+import juwoncode.commonblogproject.util.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     private final static String[] ADMIN_LINKS = {};
-
     private final static String[] SINGED_LINKS = {"/member/change/**"};
-
-    private final static String[] ANONYMOUS_LINKS = {"/api/member/register/**", "/member/login**", "/member/register/verify", "/member/register**", "/email/verify/**"};
-
+    private final static String[] ANONYMOUS_LINKS = {"/api/member/register/**", "/member/login**", "/member/register/verify"
+            , "/member/register**", "/email/verify/**"};
     private final static String[] PUBLIC_LINKS = {"/", "/home"};
-
     private final static String[] STATIC_RESOURCES = {"/layout/**", "/css/**", "/js/**", "/image/**"};
 
     private final MemberDetailsService memberDetailsService;
+    private final AuthenticationConfiguration authenticationConfiguration;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenParser jwtTokenParser;
+    private final JwtTokenService jwtTokenService;
 
-    private final AuthExceptionHandler authExceptionHandler;
-
-    public SecurityConfig(MemberDetailsService memberDetailsService, AuthExceptionHandler authExceptionHandler) {
+    public SecurityConfig(MemberDetailsService memberDetailsService, AuthenticationConfiguration authenticationConfiguration
+            , JwtTokenProvider jwtTokenProvider, JwtTokenParser jwtTokenParser, JwtTokenService jwtTokenService) {
         this.memberDetailsService = memberDetailsService;
-        this.authExceptionHandler = authExceptionHandler;
+        this.authenticationConfiguration = authenticationConfiguration;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.jwtTokenParser = jwtTokenParser;
+        this.jwtTokenService = jwtTokenService;
+    }
+
+    @Bean
+    public AuthenticationManager getAuthenticationManager() throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     /**
@@ -58,13 +72,18 @@ public class SecurityConfig {
     public SecurityFilterChain configureSecurity(HttpSecurity httpSecurity) throws Exception {
         /*
             1. Spring Security 보안 설정
-            - csrf: Spring MVC는 공격에 취약할 수 있으므로 기본값으로 활성화.
+            - csrf: JWT 토큰은 비연결을 지향하므로 비활성화.
             - cors: 동일한 도메인에서 뷰와 API를 사용할 것이므로 비활성화.
-            - httpBasic: formLogin()을 사용하여 인증할 것이므로 비활성화.
+            - httpBasic: JWT 토큰을 사용할 것이므로 비활성화.
+            - formLogin: 자체적인 로그인 필터를 사용할 것이므로 비활성화.
+            - sessionManagement: 세션 생성 규칙을 stateless 상태로 설정.
          */
         httpSecurity
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable);
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         /*
             2. 회원 역할 액세스 설정
@@ -83,20 +102,6 @@ public class SecurityConfig {
                         .anyRequest().authenticated());
 
         /*
-            3. 로그인 폼 설정
-            로그인이 성공할 경우, 홈 페이지로 이동한다.
-            로그인이 실패할 경우, 로그인 페이지로 이동하며, 실패를 사용자에게 알린다.
-         */
-        httpSecurity
-                .formLogin((login) -> login
-                        .loginPage("/member/login")
-                        .successHandler((request, response, authentication) -> {
-                            response.sendRedirect("/home");
-                        })
-                        .failureHandler(authExceptionHandler)
-                        .permitAll());
-
-        /*
             4. 로그아웃 폼 설정
             로그아웃이 성공할 경우, 로그인 페이지로 이동한다.
          */
@@ -104,25 +109,23 @@ public class SecurityConfig {
                 .logout((logout) -> logout
                         .logoutUrl("/member/logout")
                         .logoutSuccessUrl("/member/login")
+                        .deleteCookies("Authority", "Refresh-Token")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
                         .permitAll());
 
+        /*
+            5. 필터 설정
+            로그인, 로그아웃과 관련된 필터들을 설정한다.
+            - LoginAuthorizationFilter: JWT 토큰을 검증하고 인가를 처리하는 필터.
+            - LoginAuthenticationFilter: 로그인을 처리하여 JWT 토큰을 발급하는 필터.
+         */
+        httpSecurity
+                .addFilter(new LoginAuthorizationFilter(getAuthenticationManager(), jwtTokenParser, jwtTokenService
+                        , memberDetailsService))
+                .addFilter(new LoginAuthenticationFilter(getAuthenticationManager(), jwtTokenProvider
+                        , jwtTokenService, memberDetailsService));
+
         return httpSecurity.build();
-    }
-
-
-
-    /**
-     * Spring Security의 인증 공급자를 생성하고 구성한다.<br>
-     * DaoAuthentication에 UserDetailsService와 PasswordEncoder를 할당하고 인스턴스를 반환한다.
-     * @return 설정이 완료된 {@link DaoAuthenticationProvider} 인스턴스.
-     */
-    @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-
-        provider.setUserDetailsService(memberDetailsService);
-        provider.setPasswordEncoder(createPasswordEncoder());
-
-        return provider;
     }
 }
