@@ -46,6 +46,12 @@
                         <li class="nav-item" id="nav-item-4">
                             <a class="nav-link" href="#">Contact</a>
                         </li>
+                        <li class="nav-item" id="nav-item-5">
+                            <button class="nav-link" id="nav-login-button">Login</button>
+                            <form id="form-logout" th:method="post" th:action="@{~/api/member/logout}">
+                                <button class="nav-link" id="nav-logout-button">Logout</button>
+                            </form>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -66,5 +72,51 @@
             </div>
         </div>
     </footer>
+
+    <!-- Header Script -->
+    <script th:fragment="fragment-script">
+        const navLoginButton = document.getElementById('nav-login-button');
+        const formLogout = document.getElementById('form-logout');
+        const navLogoutButton = document.getElementById('nav-logout-button');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const username = localStorage.getItem('Username');
+
+            showNavigationButton(username);
+        });
+
+        navLoginButton.addEventListener('click', () => {
+            redirectLoginPage();
+        });
+
+        navLogoutButton.addEventListener('click', (e) => {
+            if (window.confirm('Are you sure want to logout?')) {
+                logoutProcess();
+            } else {
+                e.preventDefault();
+            }
+        });
+
+        function showNavigationButton(username) {
+            if (username) {
+                navLoginButton.style.display = 'none';
+                formLogout.style.display = 'block';
+            } else {
+                navLoginButton.style.display = 'block';
+                formLogout.style.display = 'none';
+            }
+        }
+
+        function redirectLoginPage() {
+            window.location.href = '/member/login';
+        }
+
+        function logoutProcess() {
+            const form = document.getElementById('form-logout');
+            alert('Logout Successfully!!!');
+            localStorage.clear();
+            form.submit();
+        }
+    </script>
 </body>
 </html>

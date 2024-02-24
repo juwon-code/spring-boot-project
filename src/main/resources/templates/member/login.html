@@ -22,7 +22,7 @@
                         <label for="password">Password</label>
                     </div>
                     <div class="mb-2">
-                        <span class="text-danger" id="error" th:text="${message}"></span>
+                        <span class="text-danger" id="login-result-span" text=""></span>
                     </div>
                     <div class="mb-2">
                         <button type="button" class="form-control btn btn-primary btn-lg" id="login-button">Login</button>
@@ -35,41 +35,71 @@
     <footer th:replace="~{layout/fragments :: fragment-footer}">
     </footer>
 
-    <script>
-        const button = document.getElementById('login-button');
+    <script th:replace="~{layout/fragments :: fragment-script}">
+    </script>
 
-        button.addEventListener('click', () => {
-            checkParameter();
+    <script>
+        const loginButton = document.getElementById('login-button');
+        const loginResultSpan = document.getElementById('login-result-span');
+
+        loginButton.addEventListener('click', () => {
+            loginProcess();
         });
 
-        function checkParameter() {
+        async function loginProcess() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            let isValid = true;
+            let isOk = true;
 
-            if (!checkUsername(username) && !checkPassword(password)) {
-                updateErrorText("유저명 또는 비밀번호가 비어있습니다.");
-                isValid = false;
+            if (!await checkParamsEmpty(username, password)) {
+                setResultText('Please enter your username and password.');
+                isOk = false;
             }
 
-            if (isValid === true) {
-                const form = document.getElementById('form-login');
-                form.submit();
+            if (isOk === true) {
+                await fetchLogin(username, password);
             }
         }
 
-        function checkUsername(username) {
-            return username !== '';
+        async function fetchLogin(username, password) {
+            const uri = '/api/member/login';
+            const data = {
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({username, password})
+            }
+
+            try {
+                const response = await fetch(uri, data);
+                const json = await response.json();
+
+                if (json.ok === false) {
+                    setResultText(json.message);
+                    return false;
+                }
+
+                const accessToken = response.headers.get('Authorization');
+                const refreshToken = response.headers.get('Refresh-Token');
+                const username = response.headers.get('Username');
+
+                localStorage.setItem('Access-Token', accessToken);
+                localStorage.setItem('Refresh-Token', refreshToken);
+                localStorage.setItem('Username', username);
+
+                window.location.href = '/home';
+            } catch (error) {
+                alert('A problem occurred during login process. please contact administrator.');
+            }
         }
 
-        function checkPassword(password) {
-            return password !== '';
+        function checkParamsEmpty(username, password) {
+            return username !== '' && password !== '';
         }
 
-        function updateErrorText(newText) {
-            const span = document.getElementById('error');
-
-            span.innerText = newText;
+        function setResultText(message) {
+            loginResultSpan.innerText = message;
         }
     </script>
 </body>
