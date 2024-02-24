@@ -18,13 +18,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
 public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -70,13 +68,15 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
             , Authentication authResult) throws IOException, ServletException {
         setupResponse(response, HttpServletResponse.SC_OK);
 
+        String username = authResult.getName();
         JwtTokenResponse token = jwtTokenProvider.createToken(authResult);
         jwtTokenService.saveRefreshToken(token.getRefreshToken());
 
         response.addHeader("Authorization", token.getGrantType() + " " + token.getAccessToken());
         response.addHeader("Refresh-Token", token.getGrantType() + " " + token.getRefreshToken());
+        response.addHeader("Username", username);
 
-        setResponseMessage(response, true, "Token issuance was successful.");
+        setResponseMessage(response, true, "Login was successful. Welcome " + username + "!!!");
     }
 
     @Override
@@ -84,19 +84,17 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
             , AuthenticationException failed) throws IOException, ServletException {
         setupResponse(response, HttpServletResponse.SC_BAD_REQUEST);
 
-        setResponseMessage(response, false, "Token issuance failed.");
+        String message;
 
-        String error;
-
-        if (failed instanceof BadCredentialsException) {
-            error = "아이디 또는 비밀번호가 일치하지 않습니다.";
+        if (failed instanceof BadCredentialsException || failed instanceof UsernameNotFoundException) {
+            message = "Invalid ID or password. please try again.";
         } else if (failed instanceof DisabledException) {
-            error = "계정이 비활성화된 상태입니다. 인증메일을 확인해주세요.";
+            message = "Your accound is deactivated. please check your verification email.";
         } else {
-            error = "알 수 없는 문제로 로그인에 실패했습니다. 관리자에게 문의하세요.";
+            message = "Login failed due to an unknown problem. please contact site administrator.";
         }
 
-        response.sendRedirect("/member/login?message=" + URLEncoder.encode(error, StandardCharsets.UTF_8));
+        setResponseMessage(response, false, message);
     }
 
     private void setupResponse(HttpServletResponse response, int status) {
