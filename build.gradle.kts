@@ -31,6 +31,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("io.jsonwebtoken:jjwt-api:0.12.5")
     implementation("com.googlecode.json-simple:json-simple:1.1.1")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.3")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")

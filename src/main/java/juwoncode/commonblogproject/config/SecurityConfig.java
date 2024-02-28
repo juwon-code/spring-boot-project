@@ -2,6 +2,7 @@ package juwoncode.commonblogproject.config;
 
 import juwoncode.commonblogproject.service.MemberDetailsService;
 import juwoncode.commonblogproject.service.JwtTokenService;
+import juwoncode.commonblogproject.service.SocialLoginService;
 import juwoncode.commonblogproject.util.JwtTokenParser;
 import juwoncode.commonblogproject.util.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
@@ -31,14 +32,17 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtTokenParser jwtTokenParser;
     private final JwtTokenService jwtTokenService;
+    private final SocialLoginService socialLoginService;
 
     public SecurityConfig(MemberDetailsService memberDetailsService, AuthenticationConfiguration authenticationConfiguration
-            , JwtTokenProvider jwtTokenProvider, JwtTokenParser jwtTokenParser, JwtTokenService jwtTokenService) {
+            , JwtTokenProvider jwtTokenProvider, JwtTokenParser jwtTokenParser, JwtTokenService jwtTokenService
+            , SocialLoginService socialLoginService) {
         this.memberDetailsService = memberDetailsService;
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtTokenProvider = jwtTokenProvider;
         this.jwtTokenParser = jwtTokenParser;
         this.jwtTokenService = jwtTokenService;
+        this.socialLoginService = socialLoginService;
     }
 
     @Bean
@@ -112,6 +116,16 @@ public class SecurityConfig {
                         .permitAll());
 
         /*
+            6. oAuth 설정
+         */
+        httpSecurity
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("member/login/oauth2")
+                        .successHandler(getSocialLoginSuccessHandler())
+                        .failureHandler(getSocialLoginFailureHandler())
+                        .userInfoEndpoint().userService(socialLoginService));
+
+        /*
             5. 필터 설정
             로그인, 로그아웃과 관련된 필터들을 설정한다.
             - LoginAuthorizationFilter: JWT 토큰을 검증하고 인가를 처리하는 필터.
@@ -124,5 +138,15 @@ public class SecurityConfig {
                         , jwtTokenService, memberDetailsService));
 
         return httpSecurity.build();
+    }
+
+    @Bean
+    public SocialLoginSuccessHandler getSocialLoginSuccessHandler() {
+        return new SocialLoginSuccessHandler(jwtTokenProvider, jwtTokenService);
+    }
+
+    @Bean
+    public SocialLoginFailureHandler getSocialLoginFailureHandler() {
+        return new SocialLoginFailureHandler();
     }
 }

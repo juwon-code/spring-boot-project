@@ -1,6 +1,7 @@
 package juwoncode.commonblogproject.repository;
 
 import juwoncode.commonblogproject.domain.Member;
+import juwoncode.commonblogproject.vo.SocialType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -36,6 +37,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
      *      회원 Optional 객체.
      */
     Optional<Member> findMemberByUsernameAndPassword(String username, String password);
+
+    Optional<Member> findMemberBySocialIdAndSocialType(String socialId, SocialType socialType);
 
     /**
      * 회원명, 비밀번호가 일치하는 회원을 삭제한다.
