@@ -57,9 +57,6 @@ public class SocialLoginService implements OAuth2UserService<OAuth2UserRequest, 
         if (registrationId.equals("kakao")) {
             return SocialType.KAKAO;
         }
-        if (registrationId.equals("google")) {
-            return SocialType.GOOGLE;
-        }
 
         return null;
     }

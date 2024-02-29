@@ -26,9 +26,6 @@ public class SocialAttributes {
         if (type.equals(SocialType.KAKAO)) {
             return ofKakao(attributeKey, attributes);
         }
-        if (type.equals(SocialType.GOOGLE)) {
-            return ofGoogle(attributeKey, attributes);
-        }
 
         return null;
     }
@@ -44,13 +41,6 @@ public class SocialAttributes {
         return SocialAttributes.builder()
                 .attributeKey(attributeKey)
                 .socialMemberDetails(new NaverMemberDetails(attributes))
-                .build();
-    }
-
-    private static SocialAttributes ofGoogle(String attributeKey, Map<String, Object> attributes) {
-        return SocialAttributes.builder()
-                .attributeKey(attributeKey)
-                .socialMemberDetails(new GoogleMemberDetails(attributes))
                 .build();
     }
 
