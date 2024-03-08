@@ -32,6 +32,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.12.5")
     implementation("com.googlecode.json-simple:json-simple:1.1.1")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.2.3")
+    implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
@@ -43,7 +44,6 @@ dependencies {
     testImplementation("com.h2database:h2")
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
-
 }
 
 tasks.withType<Test> {
