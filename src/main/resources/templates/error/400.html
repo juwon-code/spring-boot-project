@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: fragment-head ('Common Blog Project :: 400 Error')}">
+</head>
+<body>
+    <header th:replace="~{layout/fragments :: fragment-header}">
+    </header>
+
+    <div class="container-fluid" style="min-height: 500px; margin-top: 150px; margin-bottom: 150px;">
+        <div class="col text-center">
+            <h3 class="text-dark mb-3">400</h3>
+            <p>Bad Request</p>
+        </div>
+    </div>
+
+    <footer th:replace="~{layout/fragments :: fragment-footer}">
+    </footer>
+
+    <script th:replace="~{layout/fragments :: fragment-script}">
+    </script>
+</body>
+</html>

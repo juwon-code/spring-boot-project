@@ -22,11 +22,10 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     private final static String[] ADMIN_LINKS = {};
     private final static String[] SINGED_LINKS = {"/member/change/**"};
-    private final static String[] ANONYMOUS_LINKS = {"/api/member/register/**", "/member/login**", "/member/register/verify"
-            , "/member/register**", "/email/verify/**"};
-    private final static String[] PUBLIC_LINKS = {"/", "/home"};
+    private final static String[] ANONYMOUS_LINKS = {"/api/member/register/**", "/member/login**", "/social/login**"
+            , "/member/register/verify", "/member/register**", "/email/verify/**"};
+    private final static String[] PUBLIC_LINKS = {"/", "/home", "error/**"};
     private final static String[] STATIC_RESOURCES = {"/layout/**", "/css/**", "/js/**", "/image/**"};
-
     private final MemberDetailsService memberDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtTokenProvider jwtTokenProvider;
@@ -120,7 +119,7 @@ public class SecurityConfig {
          */
         httpSecurity
                 .oauth2Login(oauth2 -> oauth2
-                        .loginPage("member/login/oauth2")
+                        .loginPage("/member/login")
                         .successHandler(getSocialLoginSuccessHandler())
                         .failureHandler(getSocialLoginFailureHandler())
                         .userInfoEndpoint().userService(socialLoginService));
