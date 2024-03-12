@@ -1,10 +1,7 @@
 package juwoncode.commonblogproject.dto;
 
-import lombok.Builder;
-
 import java.util.Map;
 
-@Builder
 public abstract class SocialMemberDetails {
     protected Map<String, Object> attributes;
 
