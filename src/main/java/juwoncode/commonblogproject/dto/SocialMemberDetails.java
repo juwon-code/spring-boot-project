@@ -20,6 +20,6 @@ public abstract class SocialMemberDetails {
             return null;
         }
 
-        return (String) map.get(key);
+        return String.valueOf(map.get(key));
     }
 }

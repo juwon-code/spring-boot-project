@@ -20,10 +20,9 @@ public class Member extends BaseTime {
     @Column(length = 20, unique = true, nullable = false)
     private String username;
 
-    @Column(nullable = false)
     private String password;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = true)
     private String email;
 
     @Enumerated(EnumType.STRING)

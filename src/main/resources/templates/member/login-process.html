@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments :: fragment-head ('Common Blog Project :: Login Process')}">
+</head>
+<body>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.key('Username')) {
+                window.location.href = '/home';
+            } else {
+                const urlParams = getUrlParams(window.location.search);
+                const accessToken = urlParams['access'];
+                const refreshToken = urlParams['refresh'];
+                const username = urlParams['username'];
+
+                localStorage.setItem('Access-Token', accessToken);
+                localStorage.setItem('Refresh-Token', refreshToken);
+                localStorage.setItem('Username', username);
+                window.location.href = '/home';
+            }
+        });
+
+        function getUrlParams(url) {
+            const params = {};
+            const urlParams = new URLSearchParams(url);
+            for (const [key, value] of urlParams) {
+                params[key] = value;
+            }
+            return params;
+        }
+    </script>
+</body>
+</html>

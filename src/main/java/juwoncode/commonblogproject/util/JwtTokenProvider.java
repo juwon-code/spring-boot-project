@@ -3,6 +3,7 @@ package juwoncode.commonblogproject.util;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import juwoncode.commonblogproject.dto.JwtTokenRequest;
 import juwoncode.commonblogproject.dto.JwtTokenResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -27,10 +28,10 @@ public class JwtTokenProvider {
         REFRESH_VALID_TIME = 604800000L;
     }
 
-    public JwtTokenResponse createToken(Authentication authentication) {
-        String username = authentication.getName();
+    public JwtTokenResponse createToken(JwtTokenRequest jwtTokenRequest) {
+        String username = jwtTokenRequest.getUsername();
         Date nowDate = new Date(System.currentTimeMillis());
-        String role = authentication.getAuthorities().stream()
+        String role = jwtTokenRequest.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 

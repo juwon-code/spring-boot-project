@@ -20,10 +20,10 @@ public class SocialAttributes {
     }
 
     public static SocialAttributes of(String type, String attributeKey, Map<String, Object> attributes) {
-        if (type.equals(SocialType.NAVER)) {
+        if (type.equals("naver")) {
             return ofNaver(attributeKey, attributes);
         }
-        if (type.equals(SocialType.KAKAO)) {
+        if (type.equals("kakao")) {
             return ofKakao(attributeKey, attributes);
         }
 

@@ -1,8 +1,11 @@
 package juwoncode.commonblogproject.config;
 
+import juwoncode.commonblogproject.filter.LoginAuthenticationFilter;
+import juwoncode.commonblogproject.filter.LoginAuthorizationFilter;
+import juwoncode.commonblogproject.handler.SocialLoginFailureHandler;
+import juwoncode.commonblogproject.handler.SocialLoginSuccessHandler;
 import juwoncode.commonblogproject.service.MemberDetailsService;
 import juwoncode.commonblogproject.service.JwtTokenService;
-import juwoncode.commonblogproject.service.SocialLoginService;
 import juwoncode.commonblogproject.util.JwtTokenParser;
 import juwoncode.commonblogproject.util.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +18,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -22,8 +26,8 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     private final static String[] ADMIN_LINKS = {};
     private final static String[] SINGED_LINKS = {"/member/change/**"};
-    private final static String[] ANONYMOUS_LINKS = {"/api/member/register/**", "/member/login**", "/social/login**"
-            , "/member/register/verify", "/member/register**", "/email/verify/**"};
+    private final static String[] ANONYMOUS_LINKS = {"/api/member/register/**", "/member/login**", "/member/login/process","/social/login**"
+            , "/member/register/verify", "/member/register**", "/email/verify/**", "/oauth2/**"};
     private final static String[] PUBLIC_LINKS = {"/", "/home", "error/**"};
     private final static String[] STATIC_RESOURCES = {"/layout/**", "/css/**", "/js/**", "/image/**"};
     private final MemberDetailsService memberDetailsService;
@@ -31,17 +35,17 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtTokenParser jwtTokenParser;
     private final JwtTokenService jwtTokenService;
-    private final SocialLoginService socialLoginService;
+    private final DefaultOAuth2UserService OAuth2UserService;
 
     public SecurityConfig(MemberDetailsService memberDetailsService, AuthenticationConfiguration authenticationConfiguration
             , JwtTokenProvider jwtTokenProvider, JwtTokenParser jwtTokenParser, JwtTokenService jwtTokenService
-            , SocialLoginService socialLoginService) {
+            , DefaultOAuth2UserService OAuth2UserService) {
         this.memberDetailsService = memberDetailsService;
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtTokenProvider = jwtTokenProvider;
         this.jwtTokenParser = jwtTokenParser;
         this.jwtTokenService = jwtTokenService;
-        this.socialLoginService = socialLoginService;
+        this.OAuth2UserService = OAuth2UserService;
     }
 
     @Bean
@@ -115,14 +119,15 @@ public class SecurityConfig {
                         .permitAll());
 
         /*
-            6. oAuth 설정
+            6. OAuth2 Settings
+            Login Page:
          */
         httpSecurity
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/member/login")
-                        .successHandler(getSocialLoginSuccessHandler())
-                        .failureHandler(getSocialLoginFailureHandler())
-                        .userInfoEndpoint().userService(socialLoginService));
+                        .redirectionEndpoint(endpoint -> endpoint.baseUri("/oauth2/callback/*"))
+                        .userInfoEndpoint(endpoint -> endpoint.userService(OAuth2UserService))
+                        .successHandler(getSocialLoginSuccessHandler()));
 
         /*
             5. 필터 설정

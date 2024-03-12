@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import juwoncode.commonblogproject.dto.JwtTokenRequest;
 import juwoncode.commonblogproject.dto.JwtTokenResponse;
 import juwoncode.commonblogproject.dto.MemberRequest;
 import juwoncode.commonblogproject.service.MemberDetailsService;
@@ -69,7 +70,12 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
         setupResponse(response, HttpServletResponse.SC_OK);
 
         String username = authResult.getName();
-        JwtTokenResponse token = jwtTokenProvider.createToken(authResult);
+        JwtTokenRequest jwtTokenRequest = JwtTokenRequest.builder()
+                .username(authResult.getName())
+                .authorities(authResult.getAuthorities())
+                .build();
+
+        JwtTokenResponse token = jwtTokenProvider.createToken(jwtTokenRequest);
         jwtTokenService.saveRefreshToken(token.getRefreshToken());
 
         response.addHeader("Authorization", token.getGrantType() + " " + token.getAccessToken());

@@ -1,24 +1,25 @@
 package juwoncode.commonblogproject.handler;
 
-import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import juwoncode.commonblogproject.dto.JwtTokenResponse;
-import juwoncode.commonblogproject.dto.SocialMember;
-import juwoncode.commonblogproject.repository.MemberRepository;
+import juwoncode.commonblogproject.dto.*;
 import juwoncode.commonblogproject.service.JwtTokenService;
+import juwoncode.commonblogproject.service.SocialLoginService;
 import juwoncode.commonblogproject.util.JwtTokenProvider;
-import lombok.RequiredArgsConstructor;
-import org.json.simple.JSONObject;
+import juwoncode.commonblogproject.vo.SocialType;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Map;
 
 @Component
-public class SocialLoginSuccessHandler implements AuthenticationSuccessHandler {
+public class SocialLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtTokenService jwtTokenService;
 
@@ -28,25 +29,27 @@ public class SocialLoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response
-            , Authentication authentication) throws IOException, ServletException {
-        String username = authentication.getName();
-        JwtTokenResponse token = jwtTokenProvider.createToken(authentication);
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+        SocialMember socialMember = (SocialMember) authentication.getPrincipal();
+        SocialType socialType = socialMember.getSocialType();
+        Map<String, Object> attributes = socialMember.getAttributes();
+        SocialMemberDetails memberDetails;
+
+        if (socialType.equals(SocialType.KAKAO)) {
+            memberDetails = new KakaoMemberDetails(attributes);
+        } else {
+            memberDetails = new NaverMemberDetails(attributes);
+        }
+
+        JwtTokenRequest jwtTokenRequest = JwtTokenRequest.builder()
+                .username(memberDetails.getUsername())
+                .authorities(socialMember.getAuthorities())
+                .build();
+
+        JwtTokenResponse token = jwtTokenProvider.createToken(jwtTokenRequest);
         jwtTokenService.saveRefreshToken(token.getRefreshToken());
 
-        response.addHeader("Authorization", token.getGrantType() + " " + token.getAccessToken());
-        response.addHeader("Refresh-Token", token.getGrantType() + " " + token.getRefreshToken());
-        response.addHeader("Username", username);
-
-        setResponseMessage(response, true, "Login was successful. Welcome " + username + "!!!");
-    }
-
-    private void setResponseMessage(HttpServletResponse response, boolean isOk, String message) throws IOException {
-        JSONObject jsonObject = new JSONObject();
-
-        jsonObject.put("ok", isOk);
-        jsonObject.put("message", message);
-
-        response.getWriter().print(jsonObject);
+        response.sendRedirect("/member/login/process?access=" + token.getAccessToken() + "&refresh="
+                + token.getRefreshToken() + "&username=" + URLEncoder.encode(memberDetails.getUsername(), StandardCharsets.UTF_8));
     }
 }

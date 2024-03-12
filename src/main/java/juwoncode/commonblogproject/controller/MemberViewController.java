@@ -3,6 +3,7 @@ package juwoncode.commonblogproject.controller;
 import juwoncode.commonblogproject.dto.EmailRequest;
 import juwoncode.commonblogproject.dto.MemberRequest;
 import juwoncode.commonblogproject.service.MemberService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +32,12 @@ public class MemberViewController {
     @GetMapping("/login")
     public String getLoginPage(@RequestParam(value = "message", required = false) String message, Model model) {
         model.addAttribute("message", message);
-
         return "member/login";
+    }
+
+    @GetMapping("/login/process")
+    public String getLoginProcessPage() {
+        return "member/login-process";
     }
 
     /**
