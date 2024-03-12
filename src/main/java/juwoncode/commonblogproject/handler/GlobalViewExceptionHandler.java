@@ -1,4 +1,4 @@
-package juwoncode.commonblogproject.exception;
+package juwoncode.commonblogproject.handler;
 
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -1,4 +1,4 @@
-package juwoncode.commonblogproject.config;
+package juwoncode.commonblogproject.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

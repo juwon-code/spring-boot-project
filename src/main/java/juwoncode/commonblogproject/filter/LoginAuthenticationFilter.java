@@ -1,4 +1,4 @@
-package juwoncode.commonblogproject.config;
+package juwoncode.commonblogproject.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;

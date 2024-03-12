@@ -1,4 +1,4 @@
-package juwoncode.commonblogproject.config;
+package juwoncode.commonblogproject.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

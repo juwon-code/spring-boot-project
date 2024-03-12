@@ -1,4 +1,4 @@
-package juwoncode.commonblogproject.exception;
+package juwoncode.commonblogproject.handler;
 
 import juwoncode.commonblogproject.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
