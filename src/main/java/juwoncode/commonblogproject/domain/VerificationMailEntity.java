@@ -1,7 +1,7 @@
 package juwoncode.commonblogproject.domain;
 
 import jakarta.persistence.*;
-import juwoncode.commonblogproject.vo.EmailType;
+import juwoncode.commonblogproject.vo.VerificationMailType;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -10,29 +10,32 @@ import org.hibernate.annotations.ColumnDefault;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Email extends BaseTime {
+public class VerificationMailEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
+    @Column(name = "ID")
     private Long id;
 
-    @Column(length = 64, nullable = false)
+    @Column(name = "CODE", length = 64, nullable = false)
     String code;
 
+    @Column(name = "TYPE")
     @Enumerated(EnumType.STRING)
-    private EmailType type;
+    private VerificationMailType type;
 
+    @Column(name = "EXPIRED")
     @ColumnDefault("false")
     private boolean expired;
 
     @ManyToOne
-    @JoinColumn(name = "m_id", referencedColumnName = "id")
-    private Member member;
+    @JoinColumn(name = "USER_ID")
+    private UserEntity userEntity;
 
     @Builder
-    public Email(String code, EmailType type, Member member) {
+    public VerificationMailEntity(String code, VerificationMailType type, UserEntity userEntity) {
         this.code = code;
         this.type = type;
-        this.member = member;
+        this.userEntity = userEntity;
     }
 }
