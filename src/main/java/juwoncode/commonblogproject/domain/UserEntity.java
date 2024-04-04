@@ -29,13 +29,13 @@ public class UserEntity extends BaseTimeEntity {
     @Column(name = "EMAIL")
     private String email;
 
-    @Column(name = "ROLE")
+    @Column(name = "ROLE", nullable = false)
     @Enumerated(EnumType.STRING)
     private RoleType role;
 
-    @Column(name = "ENABLED")
+    @Column(name = "ACTIVATED")
     @ColumnDefault("false")
-    private boolean enabled;
+    private boolean activated;
 
     @Column(name = "PROFILE_IMAGE_URL")
     private String profileImageUrl;
@@ -45,12 +45,13 @@ public class UserEntity extends BaseTimeEntity {
     private SocialInformationEntity socialInformationEntity;
 
     @Builder
-    public UserEntity(String username, String password, String email, RoleType role, String profileImageUrl, boolean enabled) {
+    public UserEntity(String username, String nickname, String password, String email, RoleType role, String profileImageUrl, boolean activated) {
         this.username = username;
+        this.nickname = nickname;
         this.password = password;
         this.email = email;
         this.role = role;
         this.profileImageUrl = profileImageUrl;
-        this.enabled = enabled;
+        this.activated = activated;
     }
 }
